@@ -1,0 +1,11 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
+Release Notes
+=============
+
+BatchRender-0.8.0 summary:
+- Batch Render is the Python plugin in iClone, providing
+  choose avatar and prop objects to add visible key in current scene time.
+
