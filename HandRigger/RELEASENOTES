@@ -1,0 +1,10 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
+Release Notes
+=============
+
+HandRigger-0.8.0 summary:
+- Hand Rigger is a Python plugin for iClone. You can use it to rig avatar's hand (fingers) among several key poses.
+
