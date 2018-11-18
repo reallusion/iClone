@@ -14,11 +14,16 @@ from PySide2.shiboken2 import wrapInstance
 
 import BoneData
 import KeyData
+from KeyData import Keys
 from enum import IntEnum
 class HandRiggerState(IntEnum):
     Disable = 0
     Ready   = 1
     Running = 2
+
+class BlendMode(IntEnum):
+    InverseSquareDistance = 0
+    NearestTwoKeys = 1
 
 sys.dont_write_bytecode = True
 
@@ -36,6 +41,9 @@ hand_rigger_state = HandRiggerState.Disable
 hand_device = None
 keys = []
 device_data = None
+key_data = None
+key_weights = []
+blend_mode = BlendMode.NearestTwoKeys
 
 # dialog
 main_dlg = None
@@ -45,6 +53,7 @@ main_dlg_root = None
 
 # hotkey action
 space_action = None
+m_action = None
 
 # RL API data member
 ui_kit = RLPy.RUi
@@ -62,6 +71,7 @@ class HandRigger(object):
         global main_dlg_view
         global main_dlg_root
         global space_action
+        global m_action
         global ui_kit
 
         main_dlg = _main_dlg
@@ -83,6 +93,8 @@ class HandRigger(object):
         space_action = wrapInstance(int(ui_kit.AddHotKey('Space')), PySide2.QtWidgets.QAction)
         space_action.triggered.connect(self.run)
         space_action.setEnabled(False)
+        m_action = wrapInstance(int(ui_kit.AddHotKey('B')), PySide2.QtWidgets.QAction) #'b' and 'B'
+        m_action.triggered.connect(self.change_mode)
 
         # Generate custom dialog
         self.main_layout = main_pyside_dlg.layout()
@@ -104,7 +116,7 @@ class HandRigger(object):
             if app_start_up:
                 register_dialog_callback()
                 register_hand_rigger_callback()
-                
+                '''
                 keys.append(KeyData.get_key_0())
                 keys.append(KeyData.get_key_1())
                 keys.append(KeyData.get_key_2())
@@ -112,6 +124,9 @@ class HandRigger(object):
                 keys.append(KeyData.get_key_4())
                 keys.append(KeyData.get_key_5())
                 keys.append(KeyData.get_key_6())
+                '''
+                key_data = Keys()
+                keys = key_data.get_data()
 
                 hand_device = mocap_manager.AddHandDevice('hand_rigger')
                 app_start_up = False
@@ -121,15 +136,19 @@ class HandRigger(object):
     def hide(self):
         global main_pyside_dlg
         global space_action
+        global m_action
 
+        print('hide')
         if main_pyside_dlg.isVisible():
             space_action.setEnabled(False)
+            m_action.setEnabled(False)
             main_pyside_dlg.hide()
             
     def get_main_dlg(self):
         global main_dlg_view
         return main_dlg_view
 
+    # hotkey: 'space'
     def run(self):
         global hand_rigger_state
         global mocap_manager
@@ -147,6 +166,17 @@ class HandRigger(object):
             set_hand_rigger_state(HandRiggerState.Ready)
             if mocap_manager != None:
                 mocap_manager.Stop()
+
+    # hotkey: 'b' or 'B'
+    def change_mode(self):
+        global blend_mode
+        global main_dlg_root
+
+        if blend_mode == BlendMode.InverseSquareDistance:
+            blend_mode = BlendMode.NearestTwoKeys
+        elif blend_mode == BlendMode.NearestTwoKeys:
+            blend_mode = BlendMode.InverseSquareDistance
+        main_dlg_root.setBlendMode(blend_mode)
 
     def rigger_init(self):
         global hand_device
@@ -184,21 +214,33 @@ class HandRigger(object):
         global hand_device
         global mocap_manager
         global device_data
+        global key_weights
 
         if hand_device.IsTPoseReady() == False:
             t_pose = BoneData.get_t_pose()
             device_data = copy.deepcopy(t_pose)
             hand_device.SetTPoseData(t_pose)
+            key_weights = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            return key_weights
 
         else:
-            self.nearest_two_keys(square_dist)          # method 2
-            #self.inverse_square_distance(square_dist)  # method 1
+            if blend_mode == BlendMode.InverseSquareDistance:
+                self.inverse_square_distance(square_dist)
+            elif blend_mode == BlendMode.NearestTwoKeys:
+                self.nearest_two_keys(square_dist)
 
             hand_device.ProcessData(0, device_data, -1)
+        #key_weights = []
+        #key_weights.append([1.1,2.2,9.7])
+        #key_weights.append(1.1)
+        #key_weights.append(2.2)
+        #key_weights.append(9.9)
+        return key_weights
 
     def inverse_square_distance(self, square_dist):
         global keys
         global device_data
+        global key_weights
         
         offset = 6*16
         num_of_hand_bone = 6*20
@@ -219,9 +261,12 @@ class HandRigger(object):
             for j in range(7):
                 device_data[offset+i] = device_data[offset+i] + square_dist[j] * keys[j][i]
 
+        key_weights = copy.deepcopy(square_dist)
+
     def nearest_two_keys(self, square_dist):
         global keys
         global device_data
+        global key_weights
 
         offset = 6*16
         num_of_hand_bone = 6*20
@@ -236,20 +281,39 @@ class HandRigger(object):
         key_1_dist = math.sqrt(square_dist[key_1_index])
         key_2_dist = math.sqrt(square_dist[key_2_index])
         dist_sum = key_1_dist + key_2_dist
+        w1 = key_2_dist/dist_sum
+        w2 = key_1_dist/dist_sum
         for i in range(num_of_hand_bone):
-            device_data[offset+i] = (key_2_dist/dist_sum) * keys[key_1_index][i] + (key_1_dist/dist_sum) * keys[key_2_index][i]
+            device_data[offset+i] = w1 * keys[key_1_index][i] + w2 * keys[key_2_index][i]
 
+        key_weights = []
+        for i in range(7):
+            if i == key_1_index:
+                key_weights.append(w1)
+            elif i == key_2_index:
+                key_weights.append(w2)
+            else:
+                key_weights.append(0.0)
+            
 class DialogCallback(RLPy.RDialogEventCallback):
     def __init__(self):
         RLPy.RDialogEventCallback.__init__(self)
         self.show_fptr = None
+        self.hide_fptr = None
 
     def OnDialogShow(self):
         if self.show_fptr is not None:
             self.show_fptr()
 
+    def OnDialogHide(self):
+        if self.hide_fptr is not None:
+            self.hide_fptr()
+
     def register_show_callback(self, show_function):
         self.show_fptr = show_function
+
+    def register_hide_callback(self, hide_function):
+        self.hide_fptr = hide_function
 
 class HandRiggerCallback(RLPy.REventListenerCallback):
     def __init__(self):
@@ -263,6 +327,7 @@ def register_dialog_callback():
     global main_dlg_callback
     main_dlg_callback = DialogCallback()
     main_dlg_callback.register_show_callback(on_show)
+    main_dlg_callback.register_hide_callback(on_hide)
     main_dlg.RegisterEventCallback(main_dlg_callback)
 
 def register_hand_rigger_callback():
@@ -275,7 +340,17 @@ def register_hand_rigger_callback():
     
 def on_show():
     update_hand_rigger_state()
-    
+
+def on_hide():
+    global space_action
+    global hand_rigger_state
+    global mocap_manager
+
+    if hand_rigger_state == HandRiggerState.Running:
+        set_hand_rigger_state(HandRiggerState.Disable)
+        mocap_manager.Stop()
+        space_action.setEnabled(False)
+
 def update_hand_rigger_state():
     global main_dlg_root
     global avatar

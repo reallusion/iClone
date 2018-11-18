@@ -90,8 +90,8 @@ if __name__ == '__main__':
 
 #####################  HandRig Kit  #####################
 class HandRigQmlModule(PySide2.QtCore.QObject):
-    @PySide2.QtCore.Slot('QVariantList')
+    @PySide2.QtCore.Slot('QVariantList', result='QVariantList')
     def process_data(self, square_dist):
         global hand_rigger
         if hand_rigger is not None:
-            hand_rigger.process_data(square_dist)
+            return hand_rigger.process_data(square_dist)

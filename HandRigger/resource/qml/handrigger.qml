@@ -6,14 +6,17 @@ import QtQuick.Controls.Styles 1.4
 Item {
     id: item
     property var keys: []
-    property var squareDist: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  //square distance from key to mouse
+    property var squareDist: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  // square distance from key to mouse
+    property var weights: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]     // weight get from Python
     property var center: Qt.point(width/2, height/2)
     property var radius: 185                                      // radius of background circle
     property var keyRadius: 6
     property var mousePos: Qt.point(0, 0)
     property var handRiggerState: 0                               // Disable = 0, Ready = 1, Running = 2
     property var strDisable: qsTr("<< Select an avater >>")
-    property var strReady: qsTr("<< Press space to Start/Stop >>")
+    property var strReady: qsTr("[ space ]\t: start/stop\n[ B ]\t: switch blend mode")
+    property var strBlendMode: [ qsTr("Inverse Square Distance"),
+                                 qsTr("Nearest Two Keys") ]
 
     property var backgroundColor: Qt.hsla(0.28, 0.9, 0.8, 0.25)   // Qt.hsla: hue, saturation, lightness, alpha
                                                                   // another way to set color: Qt.rgba(1.0, 1.0, 1.0, 1.0)
@@ -51,9 +54,17 @@ Item {
 
                 // draw 7 keys
                 ctx.lineWidth = 1
-                ctx.strokeStyle = handRiggerState ? keyStrokeColor : keyStrokeColor2
-                ctx.fillStyle = handRiggerState ? keyFillColor : keyFillColor2
+                //ctx.strokeStyle = handRiggerState ? keyStrokeColor : keyStrokeColor2
+                //ctx.fillStyle = handRiggerState ? keyFillColor : keyFillColor2
                 for (var i=0; i<keys.length; ++i) {
+                    if (weights[i] == 0.0) {
+                        ctx.strokeStyle = keyStrokeColor2
+                        ctx.fillStyle = keyFillColor2
+                    }
+                    else {
+                        ctx.strokeStyle = Qt.hsla(0.055, 0.8, 0.07 + weights[i]*0.3, 1.0)
+                        ctx.fillStyle = Qt.hsla(0.055, 0.97, 0.1 + weights[i]*0.5, 1.0)
+                    }
                     ctx.beginPath()
                     ctx.ellipse(keys[i].x-keyRadius, keys[i].y-keyRadius, 2*keyRadius, 2*keyRadius)
                     ctx.fill()
@@ -64,6 +75,9 @@ Item {
                     // draw lines
                     ctx.strokeStyle = lineColor
                     for (var i=0; i<keys.length; ++i) {
+                        if (weights[i] == 0.0) {
+                            continue
+                        }
                         ctx.beginPath()
                         ctx.moveTo(mousePos.x, mousePos.y)
                         ctx.lineTo(keys[i].x, keys[i].y)
@@ -83,13 +97,14 @@ Item {
                     if (handRiggerState == 2) {
                         mousePos.x = mouse.x
                         mousePos.y = mouse.y
-                        label.text = "(" + mouse.x.toString() + ", " + mouse.y.toString() + ")"
+                        //label.text = "(" + mouse.x.toString() + ", " + mouse.y.toString() + ")"
                         for (var i=0; i<keys.length; ++i) {
                             var x_dist = keys[i].x - mouse.x
                             var y_dist = keys[i].y - mouse.y
                             squareDist[i] = x_dist * x_dist + y_dist * y_dist
                         }
-                        handRigger.process_data(squareDist)
+                        weights = handRigger.process_data(squareDist)
+                        //label.text = weights[0].toString() + ", " + weights[1].toString() + ", " + weights[2].toString()
                     }
                     canvas.requestPaint()
                 }
@@ -98,18 +113,36 @@ Item {
 
         Label {
             id: label
-            x: 162
+            x: 102
             y: 240
-            width: 200
+            width: 240
             height: 25
             color: "#cccccc"
-            text: qsTr("<< Press space to Start/Stop >>")
+            text: strDisable
             visible: true
-            font.pointSize: 12
+            font.pointSize: 10
+            font.family: "Arial"
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+            anchors.horizontalCenter: parent.horizontalCenter
+            //anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Label {
+            id: labelBlendMode
+            x: 4
+            y: 130
+            width: 300
+            height: 16
+            color: "#cccccc"
+            text: strBlendMode[1]
+            visible: true
+            font.pointSize: 10
+            font.family: "Arial"
+            font.bold: true
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
-            //anchors.verticalCenter: parent.verticalCenter
         }
     }
     Component.onCompleted: {
@@ -128,15 +161,29 @@ Item {
         switch (handRiggerState) {
             case 0:
                 label.text = strDisable
+                label.horizontalAlignment = Text.AlignHCenter
+                label.anchors.horizontalCenter = parent.horizontalCenter
+                for ( var i=0; i<7; ++i) {
+                    weights[i] = 0.0
+                }
                 break
             case 1:
                 label.text = strReady
+                label.horizontalAlignment = Text.AlignLeft
+                label.anchors.horizontalCenter = parent.left
+                for ( var i=0; i<7; ++i) {
+                    weights[i] = 0.0
+                }
                 break
             case 2:
-                label.text = qsTr("Running")
+                label.text = qsTr("")
                 break
         }
         item.enabled = state > 0
         canvas.requestPaint()
+    }
+    function setBlendMode( mode )
+    {
+        labelBlendMode.text = strBlendMode[mode]
     }
 }
