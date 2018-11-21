@@ -99,9 +99,17 @@ class LayerManagerTreeWidget(QTreeWidget):
         for key, value in self.items_dict.items():
             for key2, value2 in self.items_dict[key].items():
                 if (value2.checkState(0)==Qt.Checked):
-                    print (key2 + " set visible" )
+                    #print (key2 + " set visible" )
+                    for item in self.scene_objects:
+                        _name = item.GetName()
+                        if (_name == key2):
+                            RLPy.RScene.Show(item)
                 else:
-                    print (key2 + " set invisible" )
+                    #print (key2 + " set invisible" )
+                    for item in self.scene_objects:
+                        _name = item.GetName()
+                        if (_name == key2):
+                            RLPy.RScene.Hide(item)
     
     def on_object_selection_changed(self):
         _selected_items = RLPy.RGlobal.GetSelectedObjects()
