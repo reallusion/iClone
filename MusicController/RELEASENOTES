@@ -1,0 +1,9 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
+Release Notes
+=============
+
+Music Controller-0.8.0 summary:
+- Music Controller use hotkey to play the sound.
