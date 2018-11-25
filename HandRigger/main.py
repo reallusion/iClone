@@ -41,12 +41,13 @@ def initialize_plugin():
     global hand_rigger
 
     print('initialize plugin ...')
-    
+
+    '''
     app = PySide2.QtWidgets.QApplication.instance()
     if not app:
         app = PySide2.QtWidgets.QApplication([])
     app.aboutToQuit.connect(close_application)
-
+    '''
     # init mainwindow
     main_widget = wrapInstance(int(ui_kit.GetMainWindow()), PySide2.QtWidgets.QWidget)
 
@@ -72,10 +73,10 @@ def uninitialize_plugin():
 def show_main_dlg():
     global hand_rigger
     hand_rigger.show()
-
+'''
 def close_application():
     print('close "HandRigger"')
-
+'''
 def main():
     global app
     app = PySide2.QtWidgets.QApplication.instance()

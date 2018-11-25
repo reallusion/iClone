@@ -116,15 +116,6 @@ class HandRigger(object):
             if app_start_up:
                 register_dialog_callback()
                 register_hand_rigger_callback()
-                '''
-                keys.append(KeyData.get_key_0())
-                keys.append(KeyData.get_key_1())
-                keys.append(KeyData.get_key_2())
-                keys.append(KeyData.get_key_3())
-                keys.append(KeyData.get_key_4())
-                keys.append(KeyData.get_key_5())
-                keys.append(KeyData.get_key_6())
-                '''
                 key_data = Keys()
                 keys = key_data.get_data()
 
@@ -215,11 +206,12 @@ class HandRigger(object):
         global mocap_manager
         global device_data
         global key_weights
+        global avatar
 
-        if hand_device.IsTPoseReady() == False:
+        if hand_device.IsTPoseReady(avatar) == False:
             t_pose = BoneData.get_t_pose()
             device_data = copy.deepcopy(t_pose)
-            hand_device.SetTPoseData(t_pose)
+            hand_device.SetTPoseData(avatar, t_pose)
             key_weights = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             return key_weights
 
@@ -230,11 +222,7 @@ class HandRigger(object):
                 self.nearest_two_keys(square_dist)
 
             hand_device.ProcessData(0, device_data, -1)
-        #key_weights = []
-        #key_weights.append([1.1,2.2,9.7])
-        #key_weights.append(1.1)
-        #key_weights.append(2.2)
-        #key_weights.append(9.9)
+
         return key_weights
 
     def inverse_square_distance(self, square_dist):
@@ -295,9 +283,9 @@ class HandRigger(object):
             else:
                 key_weights.append(0.0)
             
-class DialogCallback(RLPy.RDialogEventCallback):
+class DialogCallback(RLPy.RDialogCallback):
     def __init__(self):
-        RLPy.RDialogEventCallback.__init__(self)
+        RLPy.RDialogCallback.__init__(self)
         self.show_fptr = None
         self.hide_fptr = None
 
@@ -315,9 +303,9 @@ class DialogCallback(RLPy.RDialogEventCallback):
     def register_hide_callback(self, hide_function):
         self.hide_fptr = hide_function
 
-class HandRiggerCallback(RLPy.REventListenerCallback):
+class HandRiggerCallback(RLPy.REventCallback):
     def __init__(self):
-        RLPy.REventListenerCallback.__init__(self)
+        RLPy.REventCallback.__init__(self)
 
     def OnObjectSelectionChanged(self):
         update_hand_rigger_state()
@@ -335,7 +323,7 @@ def register_hand_rigger_callback():
     global hand_rigger_callback_list
     
     hand_rigger_callback = HandRiggerCallback()
-    callback_id = RLPy.REventHandler.RegisterEventListenerCallback(hand_rigger_callback)
+    callback_id = RLPy.REventHandler.RegisterCallback(hand_rigger_callback)
     hand_rigger_callback_list.append(callback_id)
     
 def on_show():

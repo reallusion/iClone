@@ -264,10 +264,10 @@ class Keys(object):
             key_name[1],
             key_name[0],
             key_name[2],
-            key_name[3],
+            key_name[10],
             key_name[4],
-            key_name[5],
-            key_name[6] ]
+            key_name[9],
+            key_name[7] ]
 
     def set_key(self, key_index, key):
         self.key_name_list[key_index] = key

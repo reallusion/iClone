@@ -14,9 +14,9 @@ Item {
     property var mousePos: Qt.point(0, 0)
     property var handRiggerState: 0                               // Disable = 0, Ready = 1, Running = 2
     property var strDisable: qsTr("<< Select an avater >>")
-    property var strReady: qsTr("[ space ]\t: start/stop\n[ B ]\t: switch blend mode")
-    property var strBlendMode: [ qsTr("Inverse Square Distance"),
-                                 qsTr("Nearest Two Keys") ]
+    property var strReady: qsTr("[ Hotkey ]\n - Space\t: start/stop\n - B\t: switch blend mode")
+    property var strBlendMode: [ qsTr("[ Blend Mode ]\n inverse square distance"),
+                                 qsTr("[ Blend Mode ]\n nearest two keys") ]
 
     property var backgroundColor: Qt.hsla(0.28, 0.9, 0.8, 0.25)   // Qt.hsla: hue, saturation, lightness, alpha
                                                                   // another way to set color: Qt.rgba(1.0, 1.0, 1.0, 1.0)
@@ -54,16 +54,18 @@ Item {
 
                 // draw 7 keys
                 ctx.lineWidth = 1
-                //ctx.strokeStyle = handRiggerState ? keyStrokeColor : keyStrokeColor2
-                //ctx.fillStyle = handRiggerState ? keyFillColor : keyFillColor2
                 for (var i=0; i<keys.length; ++i) {
-                    if (weights[i] == 0.0) {
+                    if(handRiggerState == 0) {  // Disable
                         ctx.strokeStyle = keyStrokeColor2
                         ctx.fillStyle = keyFillColor2
                     }
                     else {
-                        ctx.strokeStyle = Qt.hsla(0.055, 0.8, 0.07 + weights[i]*0.3, 1.0)
-                        ctx.fillStyle = Qt.hsla(0.055, 0.97, 0.1 + weights[i]*0.5, 1.0)
+                        var h = 0.20 - weights[i]*0.19
+                        var s = 0.6  + weights[i]*0.35
+                        var l = 0.35 + weights[i]*0.15
+                        var a = 1.0
+                        ctx.strokeStyle = Qt.hsla( h, s, l, a )
+                        ctx.fillStyle = Qt.hsla( h, s, l, a )
                     }
                     ctx.beginPath()
                     ctx.ellipse(keys[i].x-keyRadius, keys[i].y-keyRadius, 2*keyRadius, 2*keyRadius)
@@ -113,14 +115,14 @@ Item {
 
         Label {
             id: label
-            x: 102
-            y: 240
-            width: 240
+            x: 165
+            y: 252
+            width: 220
             height: 25
-            color: "#cccccc"
+            color: "#999999"
             text: strDisable
             visible: true
-            font.pointSize: 10
+            font.pointSize: 9
             font.family: "Arial"
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignLeft
@@ -131,18 +133,18 @@ Item {
         Label {
             id: labelBlendMode
             x: 4
-            y: 130
+            y: 370
             width: 300
             height: 16
-            color: "#cccccc"
+            color: "#888888"
             text: strBlendMode[1]
             visible: true
-            font.pointSize: 10
+            font.pointSize: 9
             font.family: "Arial"
-            font.bold: true
+            //font.bold: true
             verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignLeft  //AlignHCenter
+            //anchors.horizontalCenter: parent.horizontalCenter
         }
     }
     Component.onCompleted: {
