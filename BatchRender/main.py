@@ -67,7 +67,7 @@ def do_select_folder():
     ui_render_edit = batch_render_dlg.findChild(PySide2.QtWidgets.QTextEdit, "qtRenderText")
     for file in listdir(render_folder):
         if isfile(join(render_folder, file)) and file.lower().endswith(".iproject"):
-            render_files.append(file)
+            render_files.append(render_folder + "/" + file)
     if ui_render_edit:
         ui_render_edit.insertPlainText("Select %d project files\n" % (len(render_files)))
     
@@ -77,8 +77,7 @@ def do_batch_render():
     for file in render_files:
         if ui_render_edit:
             ui_render_edit.insertPlainText("Loading %s...\n" % (file))
-        render_file = render_folder + "/" + file
-        if RLPy.RFileIO.LoadFile(render_file):
+        if RLPy.RFileIO.LoadFile(file):
             if ui_render_edit:
                 ui_render_edit.insertPlainText("Rendering %s...\n" % (file))
             RLPy.RGlobal.RenderVideo()
