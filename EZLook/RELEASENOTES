@@ -1,0 +1,9 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
+Release Notes
+=============
+
+EZLook -0.8.0 summary:
+- EZLook use ManagerLayer to make camera looking at the object in scene.
