@@ -17,3 +17,6 @@ and new features for older versions.
 
 
  -- Reallusion Maintainers
+
+![image](https://github.com/reallusion/iClone/EZLook/Gif/EZLook_gif.gif)
+
