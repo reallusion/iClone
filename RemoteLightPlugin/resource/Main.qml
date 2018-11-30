@@ -7,7 +7,7 @@ import QtQml 2.2
 Rectangle{
     id: remoteLightRect
     width: 350
-    height: 780
+    height: 100
     visible: true
     color: "#282828"
     border.width: 1
