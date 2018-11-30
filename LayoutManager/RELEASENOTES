@@ -5,6 +5,9 @@ and CHANGES files.
 Release Notes
 =============
 
+LayerManager-0.8.2 summary:
+- Fixed Layer check status can't affect child node (object).
+
 LayerManager-0.8.1 summary:
 - Add scene show and hide function.
 
