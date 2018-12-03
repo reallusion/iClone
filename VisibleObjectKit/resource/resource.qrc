@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/slmlite">
+    <qresource prefix="/objKit">
         <file>qml/Main.qml</file>
         <file>icon/CheckOff.svg</file>
         <file>icon/CheckOff_dis.svg</file>
@@ -7,6 +7,6 @@
         <file>icon/CheckOn_dis.svg</file>
         <file>icon/CheckOn_hov.svg</file>
         <file>icon/CheckOn_sel.svg</file>
-        <file>icon/SLMLite.svg</file>
+        <file>icon/objKit.svg</file>
     </qresource>
 </RCC>

@@ -4,7 +4,7 @@ See the RELEASENOTES file for a summary of changes in each release.
 Issue # numbers mentioned below can be found on Github. For more details, add
 the issue number to the end of the URL: https://github.com/reallusion/iClone/issues
 
-Version 0.8.0 (in progress)
+Version 0.9.0 (in progress)
 ===========================
 
 2018-11-09: seanlin
@@ -14,3 +14,6 @@ Version 0.8.0 (in progress)
 
 2018-12-03: seanlin
             Sync using api in development, sync with iClone version 7.4
+
+2018-12-03: seanlin
+            Rename Simple Layer Manager Lite to Visible Object Kit.

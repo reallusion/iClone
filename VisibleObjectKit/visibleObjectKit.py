@@ -12,16 +12,16 @@ from PySide2.shiboken2 import wrapInstance
 
 sys.dont_write_bytecode = True
 
-# Load Simple Layer Manager Lite rcc
+# Load Visible Object Kit rcc
 execute_parent_path = os.path.abspath(os.path.join(sys.executable, os.pardir))
-res_path = execute_parent_path + "\\OpenPlugin\\SimpleLayerManagerLite\\resource"
+res_path = execute_parent_path + "\\OpenPlugin\\VisibleObjectKit\\resource"
 sys.path.insert(0, res_path)
-QResource.registerResource(execute_parent_path + "\\OpenPlugin\\SimpleLayerManagerLite\\resource\\resource.rcc")
+QResource.registerResource(execute_parent_path + "\\OpenPlugin\\VisibleObjectKit\\resource\\resource.rcc")
 
 # Dialog param
 dialog_show_first_time = False
 
-# Simple Layer Manager Lite dialog
+# Visible Object Kit dialog
 main_dlg = None
 main_pyside_dlg = None
 main_dlg_view = None
@@ -42,9 +42,9 @@ prop_list = []
 event_list = []
 
 # Callback
-slm_lite_callback = None
+obj_kit_callback = None
 
-class SLMLite(object):
+class ObjectKit(object):
     def __init__(self, _main_dlg):
         global main_dlg
         global main_pyside_dlg
@@ -56,7 +56,7 @@ class SLMLite(object):
         main_dlg = _main_dlg
 
         # Create an URL to the QML file
-        main_dlg_url = QUrl("qrc:/slmlite/qml/Main.qml")
+        main_dlg_url = QUrl("qrc:/objKit/qml/Main.qml")
         main_dlg_view = PySide2.QtQuickWidgets.QQuickWidget()
         main_dlg_view.setSource(main_dlg_url)
         main_dlg_view.setResizeMode(PySide2.QtQuickWidgets.QQuickWidget.SizeRootObjectToView)
@@ -66,7 +66,7 @@ class SLMLite(object):
 
         # Set dialog Layout with titlebar
         main_pyside_dlg = wrapInstance(int(main_dlg.GetWindow()), PySide2.QtWidgets.QDialog)
-        main_pyside_dlg.setObjectName("Simple Layer Manager Lite")
+        main_pyside_dlg.setObjectName("Visible Object Kit")
 
         # HotKey
         esc_action = wrapInstance(int(ui_kit.AddHotKey("Escape")), PySide2.QtWidgets.QAction)
@@ -107,7 +107,7 @@ class SLMLite(object):
         global main_dlg_view
         return main_dlg_view
 
-class SMLLiteQmlModule(PySide2.QtCore.QObject):
+class ObjectKitQmlModule(PySide2.QtCore.QObject):
     @PySide2.QtCore.Slot(bool)
     def get_all_objects(self, active):
         global get_all_objects_last_time
@@ -149,7 +149,7 @@ class SMLLiteQmlModule(PySide2.QtCore.QObject):
                 else:
                     RLPy.RScene.Hide(selected_objects[i])
 
-class SMLLiteCallback(RLPy.REventCallback):
+class ObjectKitCallback(RLPy.REventCallback):
     def __init__(self):
         RLPy.REventCallback.__init__(self)
 
@@ -198,11 +198,11 @@ def clear_data_list():
     prop_list = []
 
 def register_event_handler():
-    global slm_lite_callback
+    global obj_kit_callback
     global event_list
 
-    slm_lite_callback = SMLLiteCallback()
-    callback_id = RLPy.REventHandler.RegisterCallback(slm_lite_callback)
+    obj_kit_callback = ObjectKitCallback()
+    callback_id = RLPy.REventHandler.RegisterCallback(obj_kit_callback)
     event_list.append(callback_id)
 
 def unregister_event_handler():

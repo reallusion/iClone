@@ -20,12 +20,12 @@ Rectangle{
     property var visibleChkEnabledStatus: false
     property var visibleChkCheckedStatus: True
 
-    property var checkedDefault: "qrc:///slmlite/icon/CheckOn_sel.svg"
-    property var checkedHover: "qrc:///slmlite/icon/CheckOn_hov.svg"
-    property var checkedDisable: "qrc:///slmlite/icon/CheckOn_dis.svg"
-    property var uncheckedDefault: "qrc:///slmlite/icon/CheckOff.svg"
-    property var uncheckedHover: "qrc:///slmlite/icon/CheckOff_hov.svg"
-    property var uncheckedDisable: "qrc:///slmlite/icon/CheckOff_dis.svg"
+    property var checkedDefault: "qrc:///objKit/icon/CheckOn_sel.svg"
+    property var checkedHover: "qrc:///objKit/icon/CheckOn_hov.svg"
+    property var checkedDisable: "qrc:///objKit/icon/CheckOn_dis.svg"
+    property var uncheckedDefault: "qrc:///objKit/icon/CheckOff.svg"
+    property var uncheckedHover: "qrc:///objKit/icon/CheckOff_hov.svg"
+    property var uncheckedDisable: "qrc:///objKit/icon/CheckOff_dis.svg"
 
     ColumnLayout {
             id: mainLayout
@@ -87,7 +87,7 @@ Rectangle{
                             selectAvatarsBtnActive = false;
                             selectPropsBtnActive = false;
                         }
-                        smlLiteModule.get_all_objects(selectAllBtnActive);
+                        objKitModule.get_all_objects(selectAllBtnActive);
                     }
                 }
                 Button {
@@ -122,7 +122,7 @@ Rectangle{
                             selectAllBtnActive = false;
                             selectPropsBtnActive = false;
                         }
-                        smlLiteModule.get_avatars(selectAvatarsBtnActive);
+                        objKitModule.get_avatars(selectAvatarsBtnActive);
                     }
                 }
                 Button {
@@ -157,7 +157,7 @@ Rectangle{
                             selectAllBtnActive = false;
                             selectAvatarsBtnActive = false;
                         }
-                        smlLiteModule.get_props(selectPropsBtnActive);
+                        objKitModule.get_props(selectPropsBtnActive);
                     }
                 }
             }
@@ -175,7 +175,7 @@ Rectangle{
                     enabled: visibleChkEnabledStatus
                     checked: visibleChkCheckedStatus
                     onCheckedChanged: {
-                        smlLiteModule.set_visible(checked);
+                        objKitModule.set_visible(checked);
                         console.log("[QML] visibleCheckBox onCheckedChanged");
                     }
                     Component.onCompleted:{

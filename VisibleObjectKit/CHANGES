@@ -11,3 +11,9 @@ Version 0.8.0 (November 9, 2018)
 1.  Simple Layer Manager Lite first addition.
     Simple Layer Manager Lite is the Python plugin in iClone, providing
     choose avatar and prop objects to add visible key in current scene time.
+
+
+Version 0.9.0 (December 3, 2018)
+====================================
+
+1.  Rename Simple Layer Manager Lite to Visible Object Kit.
