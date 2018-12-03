@@ -141,14 +141,17 @@ class SMLLiteQmlModule(PySide2.QtCore.QObject):
     def set_visible(self, visible):
         global selected_objects
         selected_objects = []
-        selected_objects = RLPy.RGlobal.GetSelectedObjects()
+        selected_objects = RLPy.RScene.GetSelectedObjects()
         if len(selected_objects) > 0:
             for i in range(len(selected_objects)):
-                selected_objects[i].SetVisible(RLPy.RGlobal.GetTime(), visible)
+                if visible:
+                    RLPy.RScene.Show(selected_objects[i])
+                else:
+                    RLPy.RScene.Hide(selected_objects[i])
 
-class SMLLiteCallback(RLPy.REventListenerCallback):
+class SMLLiteCallback(RLPy.REventCallback):
     def __init__(self):
-        RLPy.REventListenerCallback.__init__(self)
+        RLPy.REventCallback.__init__(self)
 
     def OnObjectSelectionChanged(self):
         global_update_visible_chk_status()
@@ -158,13 +161,13 @@ def global_get_avatars(active):
     avatar_list = []
     if active:
         avatar_type = RLPy.EAvatarType_Standard | RLPy.EAvatarType_NonStandard | RLPy.EAvatarType_StandardSeries
-        avatar_list = RLPy.RGlobal.GetAvatars(avatar_type)
+        avatar_list = RLPy.RScene.GetAvatars(avatar_type)
 
 def global_get_props(active):
     global prop_list
     prop_list = []
     if active:
-        prop_list = RLPy.RGlobal.GetProps()
+        prop_list = RLPy.RScene.GetProps()
 
 def global_select_objects():
     global avatar_list
@@ -177,14 +180,14 @@ def global_select_objects():
         total_list = avatar_list
     elif len(prop_list) > 0:
         total_list = prop_list
-    RLPy.RGlobal.SelectObjects(total_list)
+    RLPy.RScene.SelectObjects(total_list)
 
 def global_update_visible_chk_status():
     global main_pyside_dlg
     global main_dlg_root
 
     if main_dlg_root != None and main_pyside_dlg.isVisible():
-        selected_objects_count = len(RLPy.RGlobal.GetSelectedObjects())
+        selected_objects_count = len(RLPy.RScene.GetSelectedObjects())
         main_dlg_root.updateVisibleChkStatus(selected_objects_count > 0)
 
 def clear_data_list():
@@ -199,7 +202,7 @@ def register_event_handler():
     global event_list
 
     slm_lite_callback = SMLLiteCallback()
-    callback_id = RLPy.REventHandler.RegisterEventListenerCallback(slm_lite_callback)
+    callback_id = RLPy.REventHandler.RegisterCallback(slm_lite_callback)
     event_list.append(callback_id)
 
 def unregister_event_handler():
