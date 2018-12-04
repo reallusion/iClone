@@ -11,10 +11,12 @@ from PySide2.QtWidgets import QWidget
 from PySide2.shiboken2 import wrapInstance
 from PySide2.QtNetwork import QTcpServer
 from PySide2.QtNetwork import QTcpSocket
+from os import listdir
+from os.path import isfile, join
 
 sys.dont_write_bytecode = True
-exe_parent_path = os.path.abspath(os.path.join(sys.executable, os.pardir))
-res_path = exe_parent_path.replace('\\','/') + "/OpenPlugin/RemoteLightPlugin/resource/"
+#exe_parent_path = os.path.abspath(os.path.join(sys.executable, os.pardir))
+res_path = os.path.dirname(__file__)+ "/resource/"
 
 main_dlg = None
 main_qml = None
