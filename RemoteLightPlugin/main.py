@@ -65,7 +65,11 @@ def initialize_plugin():
     tcp_server.newConnection.connect( add_new_device )
 
 def uninitialize_plugin():
-    pass
+    global tcp_server
+    if tcp_server.isListening():
+        tcp_server.close()
+    if client != None:
+        client.close()
 
 def show_main_dlg():
     global main_dlg
