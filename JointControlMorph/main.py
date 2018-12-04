@@ -25,7 +25,6 @@ skeleton_bones = avatar.GetSkeletonComponent().GetSkinBones()
 motion_bones = avatar.GetSkeletonComponent().GetMotionBones()
 morph_component = avatar.GetMorphComponent()
 
-print (type(avatar))
 
 class RLPyTimerCallback(RLPy.RPyTimerCallback):
     def __init__(self):
@@ -39,7 +38,6 @@ class RLPyTimerCallback(RLPy.RPyTimerCallback):
         self.time_timeout_func = func
         
 def update_skeleton():
-    #print ("update_skeleton")
     global skeleton_bones
     global morph_component
     for bone in skeleton_bones:
