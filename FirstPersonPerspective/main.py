@@ -110,11 +110,8 @@ def camera_setting():
 
     camera_object = RLPy.RScene.FindObject(RLPy.EObjectType_Camera, "Camera")
     camera_control = camera_object.GetControl("Transform")
-    key = RLPy.RTransformKey().Clone()
-    camera_control.GetKeyAt(0, key)
-    time = key.GetTime()
     camera_transform = RLPy.RTransform.IDENTITY
-    camera_control.GetValue(time, camera_transform)
+    camera_control.GetValue(RLPy.RGlobal.GetTime(), camera_transform)
 
 # Calculate the camera rotation by mouse move
 def camera_rotate_control(offset_x, offset_y):
