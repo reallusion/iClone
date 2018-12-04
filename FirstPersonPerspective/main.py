@@ -29,12 +29,12 @@ class MoveDirection(IntEnum):
     LEFT = 3
     RIGHT = 4
 
-class MainDialog(PySide2.QtWidgets.QDialog):
+class FirstPersonDialog(PySide2.QtWidgets.QDialog):
     def __init__(self, parent=None):
         global width
         global height
         global move_offset
-        super(MainDialog, self).__init__(parent)
+        super(FirstPersonDialog, self).__init__(parent)
         self.pixmapOffset = PySide2.QtCore.QPoint()
         self.lastDragPos = PySide2.QtCore.QPoint()
         self.resize(width, height)
@@ -89,7 +89,7 @@ def initialize_plugin():
     global camera_transform
 
     # Create Camera Control Panel
-    camera_pyside_dlg = MainDialog()
+    camera_pyside_dlg = FirstPersonDialog()
     camera_pyside_dlg.setWindowTitle("Camera First Control")
 
     # Add Menu to iClone
