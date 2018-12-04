@@ -87,11 +87,7 @@ def initialize_plugin():
     global open_ui_kit
     global camera_pyside_dlg
     global camera_transform
-
-    # Create Camera Control Panel
-    camera_pyside_dlg = FirstPersonDialog()
-    camera_pyside_dlg.setWindowTitle("Camera First Control")
-
+    
     # Add Menu to iClone
     plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Camera Control", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
     plugin_action = plugin_menu.addAction("Open Camera Control")
@@ -99,6 +95,11 @@ def initialize_plugin():
 
 def show_dlg():
     global camera_pyside_dlg
+    # Create Camera Control Panel
+    if camera_pyside_dlg is None:
+        camera_pyside_dlg = FirstPersonDialog()
+        camera_pyside_dlg.setWindowTitle("Camera First Control")
+    
     camera_setting()
     camera_pyside_dlg.show()
 
