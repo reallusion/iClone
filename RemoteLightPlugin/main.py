@@ -17,11 +17,8 @@ exe_parent_path = os.path.abspath(os.path.join(sys.executable, os.pardir))
 res_path = exe_parent_path.replace('\\','/') + "/OpenPlugin/RemoteLightPlugin/resource/"
 
 main_dlg = None
-main_dlg_view = None
-main_dlg_context = None
 main_qml = None
 main_pyside_dlg = None
-main_layout = None
 
 tcp_server = None
 client = None
@@ -32,11 +29,8 @@ spot_lights = []
 
 def initialize_plugin():
     global main_dlg
-    global main_dlg_view
-    global main_dlg_context
     global main_qml
     global main_pyside_dlg
-    global main_layout
     global res_path
     global tcp_server
     # Prepare main dialog
