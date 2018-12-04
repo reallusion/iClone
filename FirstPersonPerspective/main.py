@@ -127,12 +127,12 @@ def camera_rotate_control(offset_x, offset_y):
     temp_z = float_control_z.GetValue(RLPy.RGlobal.GetTime(), rotation_z)
     
     # degree to radians and add offset
-    rotation_x = temp_x[1]*180/3.14 + offset_y
-    rotation_z = temp_z[1]*180/3.14 + offset_x
+    rotation_x = temp_x[1]*180/RLPy.RMath.CONST_PI + offset_y
+    rotation_z = temp_z[1]*180/RLPy.RMath.CONST_PI + offset_x
     
     # radians to degree
-    float_control_x.SetValue(RLPy.RGlobal.GetTime(), rotation_x/180*3.14)
-    float_control_z.SetValue(RLPy.RGlobal.GetTime(), rotation_z/180*3.14)
+    float_control_x.SetValue(RLPy.RGlobal.GetTime(), rotation_x/180*RLPy.RMath.CONST_PI)
+    float_control_z.SetValue(RLPy.RGlobal.GetTime(), rotation_z/180*RLPy.RMath.CONST_PI)
 
 # Calculate the camera translate by key
 def camera_move_control(offset, direction):
