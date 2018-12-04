@@ -109,7 +109,8 @@ def camera_setting():
     global camera_control
     global camera_transform
 
-    camera_object = RLPy.RScene.FindObject(RLPy.EObjectType_Camera, "Camera")
+    camera_list = RLPy.RScene.FindObjects(RLPy.EObjectType_Camera)
+    camera_object = camera_list[0]
     camera_control = camera_object.GetControl("Transform")
     camera_transform = RLPy.RTransform.IDENTITY
     camera_control.GetValue(RLPy.RGlobal.GetTime(), camera_transform)
