@@ -3,20 +3,10 @@ import sys
 import RLPy
 import PySide2
 from PySide2.QtCore import *
-from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtWidgets import QWidget
-from PySide2.QtQuickWidgets import QQuickWidget
-from PySide2.QtCore import QResource
 from PySide2.shiboken2 import wrapInstance
 from enum import IntEnum
-    
-# RL API data member
-open_ui_kit = RLPy.RUi
-
-app = PySide2.QtWidgets.QApplication.instance()
-if not app:
-    app = PySide2.QtWidgets.QApplication([])
 
 # RL Ui    
 camera_pyside_dlg = None
@@ -27,7 +17,6 @@ camera_control = None
 camera_transform = None
 
 # main window
-main_widget = None
 width = 400
 height = 200
 
@@ -65,7 +54,6 @@ class MainDialog(PySide2.QtWidgets.QDialog):
         self.lastDragPos = PySide2.QtCore.QPoint(event.pos())
             
     def mouseMoveEvent(self, event):
-        global camera_control
         global camera_transform
         global width
         global height
@@ -99,15 +87,13 @@ def initialize_plugin():
     global open_ui_kit
     global camera_pyside_dlg
     global camera_transform
-    global main_widget
 
     # Create Camera Control Panel
     camera_pyside_dlg = MainDialog()
-    camera_pyside_dlg.setObjectName("Camera First Control")
     camera_pyside_dlg.setWindowTitle("Camera First Control")
 
     # Add Menu to iClone
-    plugin_menu = wrapInstance(int(open_ui_kit.AddMenu("Camera Control", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Camera Control", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
     plugin_action = plugin_menu.addAction("Open Camera Control")
     plugin_action.triggered.connect(show_dlg)
 
