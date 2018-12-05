@@ -1,0 +1,11 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
+Release Notes
+=============
+
+Remote Light Plugin-0.9.0 summary:
+- Remote Light Plugin is the Python plugin in iClone, providing
+  mobile phone remote control iclone lighting system.
+

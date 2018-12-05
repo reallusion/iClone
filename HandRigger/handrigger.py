@@ -350,7 +350,7 @@ def update_hand_rigger_state():
             hand_device.RemoveAvatar(avatar)
             avatar = None
 
-        selection_list = RLPy.RGlobal.GetSelectedObjects()
+        selection_list = RLPy.RScene.GetSelectedObjects()
         if len(selection_list) > 0:
             for object in selection_list:  # find first avatar
                 object_type = object.GetType()

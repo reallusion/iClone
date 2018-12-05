@@ -12,7 +12,7 @@ Please see the CHANGES.current file for a detailed list of bug fixes and
 new features for the current release. The CHANGES file contains bug fixes
 and new features for older versions.
 
-### iClone API Update date: 20181123.1 (in progress)
+### iClone API Update date: 20181204.1 (in progress)
 
 
  -- Reallusion Maintainers

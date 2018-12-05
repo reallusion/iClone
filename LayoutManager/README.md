@@ -1,6 +1,6 @@
 # Layer Manager
 
-### Version: 0.8.0 (in progress)
+### Version: 0.8.2 (in progress)
 
 ### Introduction
 
@@ -13,7 +13,7 @@ Please see the CHANGES.current file for a detailed list of bug fixes and
 new features for the current release. The CHANGES file contains bug fixes
 and new features for older versions.
 
-### iClone API Update date: 1113.1 (in progress)
+### iClone Version : 7.4
 
 
  -- Reallusion Maintainers
