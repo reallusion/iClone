@@ -67,6 +67,7 @@ def do_select_folder():
     
     # find all .project in the folder
     render_folder = PySide2.QtWidgets.QFileDialog.getExistingDirectory()
+    render_files = []
     for file in listdir(render_folder):
         if isfile(join(render_folder, file)) and file.lower().endswith(".iproject"):
             render_files.append(render_folder + "/" + file)
@@ -92,9 +93,5 @@ def do_batch_render():
     if ui_render_edit:
         ui_render_edit.insertPlainText("Render completed!\n")
     
-def main():
+def run_script():
     initialize_plugin()
-
-# For run script
-if __name__ == '__main__':
-    main()
