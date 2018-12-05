@@ -1,10 +1,7 @@
 import os
 import sys
-
 import math
-
 import RLPy
-
 import PySide2
 from PySide2.QtMultimedia import QSound
 from PySide2.QtCore import *
@@ -14,6 +11,8 @@ from PySide2.QtWidgets import QWidget, QAbstractItemView
 from PySide2.QtWidgets import QMenu, QAction, QPushButton
 from PySide2.QtWidgets import QTreeWidgetItem, QTreeWidget, QTreeView, QTableWidget, QComboBox
 from PySide2.shiboken2 import wrapInstance
+
+music_control_widget = None
 
 class KeyControlButton(QPushButton):
     def __init__(self, text, wav, parent):
@@ -29,13 +28,6 @@ class KeyControlButton(QPushButton):
         
         self.audio_path = os.path.dirname(os.path.abspath(__file__))+"\\wav\\"+ wav+".wav"
 
-        #self.audio_object = RLPy.RAudio.CreateAudioObject()
-        #------------- crash -------------#
-        #self.audio_object.Load(self.audio_path)
-        #---------------------------------#
-        #self.selection_list = RLPy.RGlobal.GetAvatars()
-        #self.avatar = self.selection_list[0]
-        #RLPy.RAudio.LoadAudioToObject(self.avatar, self.audio_object, RLPy.RTime(0), 1000)
         
     def play(self):
         print (self.text)
@@ -59,10 +51,9 @@ class MusicController(QWidget):
         self.setLayout(self.layout)
 
 def run_script():
+    global music_control_widget
     music_control_widget = MusicController()
     music_control_widget.show()
-    
-    app.exec_()
     
     
     
