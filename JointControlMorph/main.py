@@ -47,13 +47,13 @@ def update_skeleton():
         angle_y = result_xyz[1]*180/math.pi
         angle_z = result_xyz[2]*180/math.pi
         if ( bone_name == "CC_Base_L_Forearm" ):
-            morph_component.AddKey("Motion_Dummy_Female","001_left_biceps_brachii_muscle", RLPy.RGlobal.GetTime(),angle_x/90)
+            morph_component.AddKey("Motion_Dummy_Female","001_left_biceps_brachii_muscle", RLPy.RGlobal.GetTime(),angle_x/90, False, False)
         elif ( bone_name == "CC_Base_R_Forearm" ):
-            morph_component.AddKey("Motion_Dummy_Female","002_right_biceps_brachii_muscle", RLPy.RGlobal.GetTime(),angle_x/90)
+            morph_component.AddKey("Motion_Dummy_Female","002_right_biceps_brachii_muscle", RLPy.RGlobal.GetTime(),angle_x/90, False, False)
         elif ( bone_name == "CC_Base_L_Upperarm" ):
-            morph_component.AddKey("Motion_Dummy_Female","003_left_deltoid_muscle", RLPy.RGlobal.GetTime(),1-angle_z/90)
+            morph_component.AddKey("Motion_Dummy_Female","003_left_deltoid_muscle", RLPy.RGlobal.GetTime(),1-angle_z/90, False, False)
         elif ( bone_name == "CC_Base_R_Upperarm" ):
-            morph_component.AddKey("Motion_Dummy_Female","004_right_deltoid_muscle", RLPy.RGlobal.GetTime(),1-angle_z/90)
+            morph_component.AddKey("Motion_Dummy_Female","004_right_deltoid_muscle", RLPy.RGlobal.GetTime(),1-angle_z/90, False, False)
         else:
             pass
         
