@@ -9,23 +9,10 @@ from PySide2.QtWidgets import QMenu, QAction
 from PySide2.QtWidgets import QTreeWidgetItem, QTreeWidget, QTreeView
 from PySide2.shiboken2 import wrapInstance
 
+#create main dialog
 layer_manger_dlg = None
 
-rl_event = None
-
-def global_get_avatars(active):
-    avatar_list = []
-    if active:
-        avatar_type = RLPy.EAvatarType_Standard | RLPy.EAvatarType_NonStandard | RLPy.EAvatarType_StandardSeries
-        avatar_list = RLPy.RScene.GetAvatars(avatar_type)
-    return avatar_list
-
-def global_get_props(active):
-    prop_list = []
-    if active:
-        prop_list = RLPy.RScene.GetProps()
-    return prop_list
-        
+#init object select change
 class REventListenerCallback(RLPy.REventCallback):
     def __init__(self):
         RLPy.REventCallback.__init__(self)
@@ -38,16 +25,17 @@ class REventListenerCallback(RLPy.REventCallback):
     def register_on_object_selection_changed(self, _evt):
         self.on_object_selection_changed = _evt
 
-    
 class LayerManagerTreeWidget(QTreeWidget):
     def __init__(self):
         super().__init__()
-
+        
         self.setHeaderHidden(True)
         
         self.setContextMenuPolicy(Qt.CustomContextMenu)
+        #bind context menu event to self.context_menu_requested
         self.customContextMenuRequested.connect(self.context_menu_requested)
-
+        
+        
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setDragEnabled(True)
         self.setDropIndicatorShown(True)
@@ -55,9 +43,13 @@ class LayerManagerTreeWidget(QTreeWidget):
         self.viewport().setAcceptDrops(True)
         
         global rl_event
+        #register object select change
         rl_event = REventListenerCallback()
         rl_event.register_on_object_selection_changed(self.on_object_selection_changed)
-        id = RLPy.REventHandler.RegisterCallback(rl_event)
+        RLPy.REventHandler.RegisterCallback(rl_event)
+        #get all avatars and props
+        avatar_type = RLPy.EAvatarType_Standard | RLPy.EAvatarType_NonStandard | RLPy.EAvatarType_StandardSeries
+        self.scene_objects = RLPy.RScene.GetAvatars(avatar_type) + RLPy.RScene.GetProps()
         
         self.items_dict = {} 
         
@@ -70,8 +62,6 @@ class LayerManagerTreeWidget(QTreeWidget):
         
         self.default_item.setFlags(self.default_item.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable)
         
-        self.scene_objects = global_get_avatars(True) + global_get_props(True)
-
         for item in self.scene_objects:
         
             _name = item.GetName()
@@ -119,15 +109,9 @@ class LayerManagerTreeWidget(QTreeWidget):
                 
     def context_menu_requested(self, pos):
         _menu = QMenu()
-        _item = self.itemAt(pos)
-        if _item:
-            action = QAction('Delete Item', self)
-            action.triggered.connect(lambda: self.remove_item(_item))
-            _menu.addAction(action)
-        else:
-            action = QAction('Create Layer', self)
-            action.triggered.connect(self.create_new_layer)
-            _menu.addAction(action)
+        action = QAction('Create Layer', self)
+        action.triggered.connect(self.create_new_layer)
+        _menu.addAction(action)
         _menu.exec_(self.mapToGlobal(pos))
 
     def create_new_layer(self):
@@ -140,14 +124,6 @@ class LayerManagerTreeWidget(QTreeWidget):
         self.addTopLevelItem(item)
         self.items_dict["Layer001"] = {}
         self.items_dict["Layer001"]["Layer001"] = item
-        
-    def remove_item(self, item):
-        parent = item.parent()
-        if parent:
-            parent.takeChild(parent.indexOfChild(item))
-        else:
-            self.takeTopLevelItem(self.indexOfTopLevelItem(item))
-            
 
 def run_script(): 
     global layer_manager_dlg
