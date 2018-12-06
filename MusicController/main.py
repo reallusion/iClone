@@ -27,16 +27,11 @@ class KeyControlButton(QPushButton):
         self.hot_key_action.triggered.connect(self.play)
         
         self.audio_path = os.path.dirname(os.path.abspath(__file__))+"\\wav\\"+ wav+".wav"
-
-        
+    
     def play(self):
-        print (self.text)
         QSound.play(self.audio_path)
         
 class MusicController(QWidget):
-    global rl_py_timer
-    global timer_callback
-
     def __init__(self):
         super().__init__()
         
