@@ -27,12 +27,21 @@ def uninitialize_plugin():
 
 def show_dialog():
     global batch_render_dlg
+    global render_files
     if batch_render_dlg is None:
         batch_render_dlg = create_dialog()
         
     if batch_render_dlg.isVisible():
         batch_render_dlg.hide()
     else:
+        render_files = []
+        # update ui
+        ui_lineedit = batch_render_dlg.findChild(PySide2.QtWidgets.QLineEdit, "qtFolderEdit")
+        if ui_lineedit:
+            ui_lineedit.setText("")
+        ui_render_edit = batch_render_dlg.findChild(PySide2.QtWidgets.QTextEdit, "qtRenderText")
+        if ui_render_edit:
+            ui_render_edit.clear()
         batch_render_dlg.show()
         
 def create_dialog():
@@ -78,20 +87,20 @@ def do_select_folder():
         ui_lineedit.setText(render_folder)
     ui_render_edit = batch_render_dlg.findChild(PySide2.QtWidgets.QTextEdit, "qtRenderText")
     if ui_render_edit:
-        ui_render_edit.insertPlainText("Select %d project files\n" % (len(render_files)))
+        ui_render_edit.append("Select %d project files" % (len(render_files)))
     
 def do_batch_render():
     global render_files
     ui_render_edit = batch_render_dlg.findChild(PySide2.QtWidgets.QTextEdit, "qtRenderText")
     for file in render_files:
         if ui_render_edit:
-            ui_render_edit.insertPlainText("Loading %s...\n" % (file))
+            ui_render_edit.append("Loading %s..." % (file))
         if RLPy.RFileIO.LoadFile(file):
             if ui_render_edit:
-                ui_render_edit.insertPlainText("Rendering %s...\n" % (file))
+                ui_render_edit.append("Rendering %s..." % (file))
             RLPy.RGlobal.RenderVideo() # render to file
     if ui_render_edit:
-        ui_render_edit.insertPlainText("Render completed!\n")
+        ui_render_edit.append("Render completed!")
     
 def run_script():
     initialize_plugin()
