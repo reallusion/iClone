@@ -101,13 +101,13 @@ class MusicController(QWidget):
         self.keyA_prop = RLPy.RScene.FindObject(RLPy.EObjectType_Prop, "Key_A")
         self.keyB_prop = RLPy.RScene.FindObject(RLPy.EObjectType_Prop, "Key_B")
 
-        self.button_a = KeyControlButton(49, "C", "do", self.keyC_prop, self.layout)
-        self.button_s = KeyControlButton(50, "D", "re", self.keyD_prop, self.layout)
-        self.button_d = KeyControlButton(51, "E", "mi", self.keyE_prop, self.layout)
-        self.button_f = KeyControlButton(52, "F", "fa", self.keyF_prop, self.layout)
-        self.button_g = KeyControlButton(53, "G", "so", self.keyG_prop, self.layout)
-        self.button_h = KeyControlButton(54, "A", "la", self.keyA_prop, self.layout)
-        self.button_j = KeyControlButton(55, "B", "si", self.keyB_prop, self.layout)
+        self.button_a = KeyControlButton(49, "C", "C4", self.keyC_prop, self.layout)
+        self.button_s = KeyControlButton(50, "D", "D4", self.keyD_prop, self.layout)
+        self.button_d = KeyControlButton(51, "E", "E4", self.keyE_prop, self.layout)
+        self.button_f = KeyControlButton(52, "F", "F4", self.keyF_prop, self.layout)
+        self.button_g = KeyControlButton(53, "G", "G4", self.keyG_prop, self.layout)
+        self.button_h = KeyControlButton(54, "A", "A4", self.keyA_prop, self.layout)
+        self.button_j = KeyControlButton(55, "B", "B4", self.keyB_prop, self.layout)
         
         self.setLayout(self.layout)
     
