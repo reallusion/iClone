@@ -1,6 +1,6 @@
 # Music Controller
 
-### Version: 0.8.0 (in progress)
+### Version: 0.8.1 (in progress)
 
 ### Introduction
 

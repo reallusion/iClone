@@ -5,5 +5,8 @@ and CHANGES files.
 Release Notes
 =============
 
+Music Controller-0.8.1 summary:
+- Add Keyboard project and Key animation
+
 Music Controller-0.8.0 summary:
 - Music Controller use hotkey to play the sound.
