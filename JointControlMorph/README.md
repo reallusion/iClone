@@ -1,10 +1,10 @@
-# Joint Control Morph
+# Joint Driven Morph
 
 ### Version: 0.8.0 (in progress)
 
 ### Introduction
 
-Joint Control Morph is the demo tool could apply certain morph when using IK on specific character.
+Demonstration of specific morph activation triggered by IK joint rotation.
 
 ### Release Notes
 
