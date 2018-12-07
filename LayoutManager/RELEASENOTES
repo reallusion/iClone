@@ -5,6 +5,9 @@ and CHANGES files.
 Release Notes
 =============
 
+LayerManager-0.8.3 summary:
+- Adjust Layout and clean code.
+
 LayerManager-0.8.2 summary:
 - Fixed Layer check status can't affect child node (object).
 
