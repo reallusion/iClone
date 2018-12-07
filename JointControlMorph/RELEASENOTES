@@ -5,6 +5,6 @@ and CHANGES files.
 Release Notes
 =============
 
-JointControlMorph-0.8.0 summary:
-- Joint Control Morph could apply certain body morph driven by bone rotation. You need to load the Test.iAvatar to test the result.
+JointDrivenMorph-0.8.0 summary:
+- Joint Driven Morph can be used to activate certain morphs via bone rotations.  The Test.iAvatar sample file is also available for download.
 
