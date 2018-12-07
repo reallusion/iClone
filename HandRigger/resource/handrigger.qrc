@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/handrigger">
-        <file>qml/handrigger.qml</file>
-    </qresource>
-</RCC>

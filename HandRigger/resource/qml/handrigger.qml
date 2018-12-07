@@ -6,8 +6,8 @@ import QtQuick.Controls.Styles 1.4
 Item {
     id: item
     property var keys: []
-    property var squareDist: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  // square distance from key to mouse
-    property var weights: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]     // weight get from Python
+    property var squareDist: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  // square distance from mouse to key
+    property var weights: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]     // weight return from Python
     property var center: Qt.point(width/2, height/2)
     property var radius: 185                                      // radius of background circle
     property var keyRadius: 6
@@ -21,11 +21,9 @@ Item {
     property var backgroundColor: Qt.hsla(0.28, 0.9, 0.8, 0.25)   // Qt.hsla: hue, saturation, lightness, alpha
                                                                   // another way to set color: Qt.rgba(1.0, 1.0, 1.0, 1.0)
 
-    property var backgroundColor2: Qt.hsla(0.28, 0.0, 0.8, 0.25)  // *Color2: color when handrigger is disabled
-    property var keyFillColor: Qt.hsla(0.055, 0.97, 0.6, 1.0)
-    property var keyFillColor2: Qt.hsla(0.055, 0.0, 0.6, 1.0)
-    property var keyStrokeColor: Qt.hsla(0.055, 0.8, 0.4, 1.0)
-    property var keyStrokeColor2: Qt.hsla(0.055, 0.0, 0.4, 1.0)
+    property var backgroundDisabledColor: Qt.hsla(0.28, 0.0, 0.8, 0.25)
+    property var keyDisabledFillColor: Qt.hsla(0.055, 0.0, 0.6, 1.0)
+    property var keyDisabledStrokeColor: Qt.hsla(0.055, 0.0, 0.4, 1.0)
     property var lineColor: Qt.hsla(0.0, 0.0, 0.5, 0.9)
 
     width: 400
@@ -48,7 +46,7 @@ Item {
                 ctx.reset()
 
                 // draw background circle
-                ctx.fillStyle = handRiggerState ? backgroundColor : backgroundColor2
+                ctx.fillStyle = handRiggerState ? backgroundColor : backgroundDisabledColor
                 ctx.ellipse(center.x-radius, center.y-radius, 2*radius, 2*radius)
                 ctx.fill()
 
@@ -56,8 +54,8 @@ Item {
                 ctx.lineWidth = 1
                 for (var i=0; i<keys.length; ++i) {
                     if(handRiggerState == 0) {  // Disable
-                        ctx.strokeStyle = keyStrokeColor2
-                        ctx.fillStyle = keyFillColor2
+                        ctx.strokeStyle = keyDisabledStrokeColor
+                        ctx.fillStyle = keyDisabledFillColor
                     }
                     else {
                         var h = 0.20 - weights[i]*0.19
@@ -106,7 +104,6 @@ Item {
                             squareDist[i] = x_dist * x_dist + y_dist * y_dist
                         }
                         weights = handRigger.process_data(squareDist)
-                        //label.text = weights[0].toString() + ", " + weights[1].toString() + ", " + weights[2].toString()
                     }
                     canvas.requestPaint()
                 }
@@ -157,7 +154,7 @@ Item {
         }
     }
 
-    function setHandRiggerState( state )
+    function updateHandRiggerState( state )
     {
         handRiggerState = state
         switch (handRiggerState) {

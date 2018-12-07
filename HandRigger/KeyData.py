@@ -1,3 +1,5 @@
+NUM_OF_KEYS = 7
+
 key_name = [
     'paper',        #[0]
     'fist',         #[1]
@@ -260,14 +262,14 @@ key_data = {
 class Keys(object):
     def __init__(self):
         global key_data
-        self.key_name_list = [
-            key_name[1],
-            key_name[0],
-            key_name[2],
-            key_name[10],
-            key_name[4],
-            key_name[9],
-            key_name[7] ]
+        self.key_name_list = [ #7 keys
+            'fist',
+            'paper',
+            'good',
+            'rocker',
+            'gun',
+            'victory',
+            'good' ]
 
     def set_key(self, key_index, key):
         self.key_name_list[key_index] = key
@@ -275,6 +277,6 @@ class Keys(object):
     def get_data(self):
         global key_data
         data = []
-        for i in range(7):
+        for i in range(NUM_OF_KEYS):
             data.append(key_data[self.key_name_list[i]])
         return data
