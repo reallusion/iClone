@@ -1,15 +1,6 @@
-import os
-import sys
-import RLPy
-import math
+import math, RLPy
 
-import PySide2
-from PySide2.QtCore import *
-from PySide2.QtGui import *
 from PySide2 import QtWidgets
-from PySide2.QtWidgets import QWidget, QAbstractItemView 
-from PySide2.QtWidgets import QMenu, QAction
-from PySide2.QtWidgets import QTreeWidgetItem, QTreeWidget, QTreeView, QTableWidget, QComboBox
 from PySide2.shiboken2 import wrapInstance
 
 #timer event init
@@ -63,7 +54,7 @@ def update_skeleton():
         else:
             pass
         
-class JcmWidget(QWidget):
+class JcmWidget(QtWidgets.QWidget):
     global rl_py_timer
     global timer_callback
     def __init__(self):
@@ -107,17 +98,17 @@ def run_script():
     timer_callback.register_time_out(update_skeleton)
     
     global jcm_manager_dlg
+    jcm_manager_widget = JcmWidget()
+    
     #create RDialog
     jcm_manager_dlg = RLPy.RUi.CreateRDialog()
     jcm_manager_dlg.SetWindowTitle("Joint Control Morph")
     #wrap RDialog to Pyside Dialog
-    main_pyside_dlg = wrapInstance(int(jcm_manager_dlg.GetWindow()), PySide2.QtWidgets.QDialog)
+    main_pyside_dlg = wrapInstance(int(jcm_manager_dlg.GetWindow()), QtWidgets.QDialog)
     main_pyside_layout = main_pyside_dlg.layout()
-    
-    jcm_manager_widget = JcmWidget()
 
     main_pyside_layout.addWidget(jcm_manager_widget)
-    main_pyside_dlg.adjustSize()
+    main_pyside_dlg.setFixedWidth(300)
     #show dialog
     jcm_manager_dlg.Show()
     

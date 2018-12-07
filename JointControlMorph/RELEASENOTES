@@ -5,6 +5,9 @@ and CHANGES files.
 Release Notes
 =============
 
+JointDrivenMorph-0.8.1 summary:
+- clean code
+
 JointDrivenMorph-0.8.0 summary:
 - Joint Driven Morph can be used to activate certain morphs via bone rotations.  The Test.iAvatar sample file is also available for download.
 
