@@ -86,20 +86,12 @@ def run_script():
     global layer_manager_dlg
     layer_manager_tree_widget = LayerManagerTreeWidget()
     
-    #layer_manager_dlg = RLPy.RUi.CreateRDockWidget()
-    layer_manager_dlg = RLPy.RUi.CreateRDialog()
+    layer_manager_dlg = RLPy.RUi.CreateRDockWidget()
     layer_manager_dlg.SetWindowTitle("Layer Manager")
     
-    main_pyside_dlg = wrapInstance(int(layer_manager_dlg.GetWindow()), QtWidgets.QDialog)
-    main_pyside_layout = main_pyside_dlg.layout()
+    main_pyside_dlg = wrapInstance(int(layer_manager_dlg.GetWindow()), QtWidgets.QDockWidget)
     
-    scroll_area = QtWidgets.QScrollArea()
-    scroll_area.setWidgetResizable(True)
-    scroll_area.setWidget(layer_manager_tree_widget)
-    
-    main_pyside_layout.addWidget(scroll_area)
-    
-    main_pyside_dlg.setFixedSize(300,400)
+    main_pyside_dlg.setWidget(layer_manager_tree_widget)
     
     layer_manager_dlg.Show()
     
