@@ -37,6 +37,7 @@ mocap_manager = RLPy.RGlobal.GetMocapManager()
 
 class HandRigger(object):
     def __init__(self):
+        global mocap_manager
         global hand_device
         global keys
 
@@ -63,6 +64,16 @@ class HandRigger(object):
             bone_list = BoneData.get_bone_list()
             hand_device.Initialize(bone_list)
 
+    def __del__(self):
+        global mocap_manager
+        global hand_device
+        global keys
+
+        mocap_manager.RemoveAllDevices()
+        del hand_device
+        hand_device = None
+        keys = []
+    
     def set_state(self, state):
         global mocap_manager
         self.state = state
