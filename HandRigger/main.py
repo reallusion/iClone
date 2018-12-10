@@ -30,39 +30,21 @@ hand_rigger_callback_list = []
 
 # Hotkey action
 space_action = None
+space_qaction = None
 blend_action = None
+blend_qaction = None
 
 # other global data
 hand_rigger = None
 
 def initialize_plugin():
-    global space_action
-    global blend_action
-    global hand_rigger
-
-    # Menu
     add_menu('Hand Rigger', 'Hand Rigger', show_main_dlg)
-
-    # HotKey
-    space_action = add_hotkey('Space', run)
-    space_action.setEnabled(False)
-    blend_action = add_hotkey('B', switch_blend_mode)
-    blend_action.setEnabled(False)
-
-    # create HandRigger
-    hand_rigger = HandRigger()
-
     print('"Hand Rigger" initialization done!')
 
 def uninitialize_plugin():
     print('uninitialize "Hand Rigger"')
 
 def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_context_value):
-    global main_dlg
-    global main_pyside_dlg
-    global main_qml
-    global qml_module
-
     main_dlg = RLPy.RUi.CreateRDialog()
     main_dlg.SetWindowTitle(title)                                      #title
 
@@ -76,7 +58,7 @@ def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_
     main_dlg_view.setSource(QUrl.fromLocalFile(resource_path+qml_file)) #qml_file
     main_dlg_view.setResizeMode(PySide2.QtQuickWidgets.QQuickWidget.SizeRootObjectToView)
     main_qml = main_dlg_view.rootObject()
-    
+
     # add widget to layout
     main_layout = main_pyside_dlg.layout()
     main_layout.addWidget(main_dlg_view)
@@ -87,15 +69,18 @@ def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_
     root_context = main_dlg_view.rootContext()
     root_context.setContextProperty(qml_context_name, qml_module)       #qml_context_name
 
+    return [main_dlg, main_pyside_dlg, main_qml, qml_module]
+
 def add_menu(menu_title, action_name, trigger_func):
     menu = wrapInstance(int(RLPy.RUi.AddMenu(menu_title, RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
     menu_action = menu.addAction(action_name)
     menu_action.triggered.connect(trigger_func)
-    
+
 def add_hotkey(hotkey, trigger_func):
-    action = wrapInstance(int(RLPy.RUi.AddHotKey(hotkey)), PySide2.QtWidgets.QAction)
+    qaction = RLPy.RUi.AddHotKey(hotkey)
+    action = wrapInstance(int(qaction), PySide2.QtWidgets.QAction)
     action.triggered.connect(trigger_func)
-    return action
+    return [qaction, action]
 
 def show_main_dlg():
     global main_dlg
@@ -105,19 +90,51 @@ def show_main_dlg():
     global main_dlg_callback
     global hand_rigger_callback
     global hand_rigger_callback_list
+    global space_action
+    global space_qaction
+    global blend_action
+    global blend_qaction
 
     if main_dlg is None:
+        # create dialog
         handrigger_qml_module = HandRigQmlModule()
-        create_qml_embedded_dialog('Hand Rigger', 'Hand Rigger', '/resource/qml/handrigger.qml', 'handRigger', handrigger_qml_module)
+        dialog_globals = create_qml_embedded_dialog('Hand Rigger',
+                                                    'Hand Rigger',
+                                                    '/resource/qml/handrigger.qml',
+                                                    'handRigger',
+                                                    handrigger_qml_module)
+        main_dlg        = dialog_globals[0]
+        main_pyside_dlg = dialog_globals[1]
+        main_qml        = dialog_globals[2]
+        qml_module      = dialog_globals[3]
+
         register_dialog_callback()
         register_hand_rigger_callback()
 
+        # add hotkey 'Space'
+        space_actions = add_hotkey('Space', run)
+        space_qaction = space_actions[0]
+        space_action = space_actions[1]
+        space_action.setEnabled(False)
+
+        # add hotkey 'B'
+        blend_actions = add_hotkey('B', switch_blend_mode)
+        blend_qaction = blend_actions[0]
+        blend_action = blend_actions[1]
+        blend_action.setEnabled(False)
+
     if main_dlg.IsVisible():
+        # clear callbacks
         main_dlg.UnregisterAllEventCallbacks()
         RLPy.REventHandler.UnregisterCallbacks(hand_rigger_callback_list)
         hand_rigger_callback_list = []
 
-        main_dlg.Hide()
+        # clear hotkeys
+        RLPy.RUi.RemoveHotKey(space_qaction)
+        RLPy.RUi.RemoveHotKey(blend_qaction)
+
+        #main_dlg.Hide()
+        main_dlg.Close()
 
         del main_dlg_callback
         del hand_rigger_callback
@@ -125,6 +142,10 @@ def show_main_dlg():
         del main_pyside_dlg
         del main_qml
         del qml_module
+        del space_action
+        del space_qaction
+        del blend_action
+        del blend_qaction
 
         main_dlg_callback = None
         hand_rigger_callback = None
@@ -132,6 +153,10 @@ def show_main_dlg():
         main_pyside_dlg = None
         main_qml = None
         qml_module = None
+        space_action = None
+        space_qaction = None
+        blend_action = None
+        blend_qaction = None
 
     else:
         main_dlg.Show()
@@ -198,7 +223,7 @@ def switch_blend_mode():
     if hand_rigger is not None:
         hand_rigger.set_blend_mode((hand_rigger.get_blend_mode()+1)%BlendMode.Count)
         main_qml.setBlendMode(hand_rigger.get_blend_mode())
-    
+
 class DialogCallback(RLPy.RDialogCallback):
     def __init__(self):
         RLPy.RDialogCallback.__init__(self)
