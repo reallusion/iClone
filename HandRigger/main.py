@@ -65,11 +65,10 @@ def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_
     main_pyside_dlg.adjustSize()
 
     # inject Python data into QML
-    qml_module = qml_context_value                                      #save qml_context_value to a global variable
     root_context = main_dlg_view.rootContext()
-    root_context.setContextProperty(qml_context_name, qml_module)       #qml_context_name
+    root_context.setContextProperty(qml_context_name, qml_context_value) #qml_context_name
 
-    return [main_dlg, main_pyside_dlg, main_qml, qml_module]
+    return [main_dlg, main_pyside_dlg, main_qml]
 
 def add_menu(menu_title, action_name, trigger_func):
     menu = wrapInstance(int(RLPy.RUi.AddMenu(menu_title, RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
@@ -97,16 +96,15 @@ def show_main_dlg():
 
     if main_dlg is None:
         # create dialog
-        handrigger_qml_module = HandRigQmlModule()
+        qml_module = HandRigQmlModule()
         dialog_globals = create_qml_embedded_dialog('Hand Rigger',
                                                     'Hand Rigger',
                                                     '/resource/qml/handrigger.qml',
                                                     'handRigger',
-                                                    handrigger_qml_module)
+                                                    qml_module)
         main_dlg        = dialog_globals[0]
         main_pyside_dlg = dialog_globals[1]
         main_qml        = dialog_globals[2]
-        qml_module      = dialog_globals[3]
 
         register_dialog_callback()
         register_hand_rigger_callback()
