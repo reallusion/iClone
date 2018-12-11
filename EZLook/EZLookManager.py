@@ -44,10 +44,9 @@ class EZLookEventCallback(RLPy.REventCallback):
         RLPy.REventCallback.__init__(self)
 
     def OnObjectSelectionChanged(self):
-        open_Viwer()
+        open_viewer()
 
-
-def open_Viwer(): 
+def open_viewer():
     #set dialog
     global layer_manager_dlg
     layer_manager_dlg = RLPy.RUi.CreateRDialog()
@@ -97,7 +96,6 @@ class LayerManagerTreeWidget(QTreeWidget):
         self.addTopLevelItem(self.default_item2)
         self.all_avatars = global_get_avatars(True)
         self.all_props = global_get_props(True)
-
         #set avatars menu item
         for item in self.all_avatars:        
             _name = item.GetName()            
@@ -109,7 +107,7 @@ class LayerManagerTreeWidget(QTreeWidget):
         #set props menu item
         for item in self.all_props:      
             _name = item.GetName()
-            if _name != "Shadow Catcher ": #ignore Shadow Catcher Obj
+            if _name != "Shadow Catcher ": #ignore 'Shadow Catcher' Object
                 temp_item = QTreeWidgetItem()
                 temp_item.setText(0, _name)                
                 self.items_dict["0(default)"][_name] = temp_item          
@@ -133,25 +131,42 @@ class LayerManagerTreeWidget(QTreeWidget):
         time = RLPy.RGlobal.GetTime()
 
         if(object_Clicked != None and camera!= None):
-            #get object transform and find final position
-            object_transform = object_Clicked.WorldTransform();
+            #get object postion
+            object_transform = object_Clicked.LocalTransform();
+            rotation_z = 0.0
+            object_control = object_Clicked.GetControl("Transform")
+            data_block = object_control.GetDataBlock()
+            float_control_z = data_block.GetControl('Rotation/RotationZ')
+            temp_z = float_control_z.GetValue(RLPy.RGlobal.GetTime(), rotation_z)
+            rotation_z = self.DegressTransform(temp_z[1])
+            #calculate the position by facing object 
+            Deg2Rad = (RLPy.RMath.CONST_PI*2)/360
+            angleX = RLPy.RMath.Cos((rotation_z-90)*Deg2Rad)
+            angleY = RLPy.RMath.Sin((rotation_z-90)*Deg2Rad)
+            distanceXY = ((object_transform.S().z*100)+(object_transform.S().y*100)/2)*5
             object_transform.T().z += (object_transform.S().z*100)/2
-            object_transform.T().y -= ((object_transform.S().z*100)+(object_transform.S().y*100)/2)*5
+            object_transform.T().x += distanceXY*angleX
+            object_transform.T().y += distanceXY*angleY
             #set camera rotation
-            camera.GetControl("Transform").GetDataBlock().GetControl('Rotation/RotationX').SetValue(time, self.AngularTransform(95))
+            camera.GetControl("Transform").GetDataBlock().GetControl('Rotation/RotationX').SetValue(time, self.AngularTransform(90))
             camera.GetControl("Transform").GetDataBlock().GetControl('Rotation/RotationY').SetValue(time, 0) 
-            camera.GetControl("Transform").GetDataBlock().GetControl('Rotation/RotationZ').SetValue(time, 0)
+            camera.GetControl("Transform").GetDataBlock().GetControl('Rotation/RotationZ').SetValue(time, temp_z[1])
             #reset boolean
             is_x_arrive = False
             is_y_arrive = False
             is_z_arrive = False
             #start timer function
             timer_callback.register_time_out(self.MoveAnimation)
-            rl_py_timer.Start()   
+            rl_py_timer.Start() 
+
 
     def AngularTransform(self, degrees):
         AngularValue = (degrees/180)* RLPy.RMath.CONST_PI
         return AngularValue
+
+    def DegressTransform(self, Angular):
+        DegressValue = (Angular/RLPy.RMath.CONST_PI)*180
+        return DegressValue
 
     def MoveAnimation(self):
         global timer
@@ -167,7 +182,7 @@ class LayerManagerTreeWidget(QTreeWidget):
         self.DoMoveAnimation(object_transform.T().z, camera_transform.T().z, "Z")
         self.DoMoveAnimation(object_transform.T().x, camera_transform.T().x, "X")
         #set camera position
-        camera_control.SetValue(RLPy.RGlobal.GetTime(), camera_transform) 
+        camera_control.SetValue(RLPy.RGlobal.GetTime(), camera_transform)
 
     def DoMoveAnimation(self, pos_obj, pos_camera, xyz):       
         global camera_transform
@@ -176,8 +191,8 @@ class LayerManagerTreeWidget(QTreeWidget):
         global is_z_arrive
 
         distance = RLPy.RMath.Abs(pos_obj-pos_camera)
-        is_far_away = True if(distance>=2) else False
-        speed = 30
+        is_far_away = True if(distance>=5) else False
+        speed = 10
 
         if(xyz=="X"):
             if(pos_obj > pos_camera and is_far_away):
@@ -207,7 +222,3 @@ class LayerManagerTreeWidget(QTreeWidget):
         #if XYZ arrived to stop timer
         if(is_x_arrive and is_y_arrive and is_z_arrive):
             rl_py_timer.Stop()
-    
-
-
-
