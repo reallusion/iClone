@@ -18,7 +18,7 @@ render_files = []       # render files (.iPoject)
 
 def initialize_plugin():
     # Add menu
-    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Batch Render", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
     plugin_action = plugin_menu.addAction("Batch Render")
     plugin_action.triggered.connect(show_dialog)
 
@@ -57,12 +57,15 @@ def create_dialog():
     ui_layout.setContentsMargins( 0, 0, 0, 0 )
     ui_layout.addWidget(ui_widget)
     dlg.setLayout(ui_layout)
+    dlg.setWindowTitle("Batch Render Folder")
     dlg.resize(ui_widget.size().width(), ui_widget.size().height())
     dlg.setMinimumSize(ui_widget.size())
     dlg.setMaximumSize(ui_widget.size())
 
     # connect button signals
     ui_sel_folder_btn = ui_widget.findChild(PySide2.QtWidgets.QPushButton, "qtFolderBtn")
+    ui_sel_folder_btn.setIcon(QPixmap(os.path.dirname(os.path.abspath(__file__))+"\\icon\\Load.svg"))
+
     if ui_sel_folder_btn:
         ui_sel_folder_btn.clicked.connect(do_select_folder)
     ui_render_btn = ui_widget.findChild(PySide2.QtWidgets.QPushButton, "qtRenderButton")
@@ -87,7 +90,7 @@ def do_select_folder():
         ui_lineedit.setText(render_folder)
     ui_render_edit = batch_render_dlg.findChild(PySide2.QtWidgets.QTextEdit, "qtRenderText")
     if ui_render_edit:
-        ui_render_edit.append("Select %d project files" % (len(render_files)))
+        ui_render_edit.append("%d project files elected" % (len(render_files)))
     
 def do_batch_render():
     global render_files
