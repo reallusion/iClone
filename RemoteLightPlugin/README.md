@@ -1,11 +1,10 @@
-# Remote Light Plugin
+# Light Remote Control
 
 ### Version: 0.9.0 (in progress)
 
 ### Introduction
 
-Remote Light Plugin is the Python plugin in iClone, providing
-mobile phone remote control iclone lighting system.
+Light Remote Control provides control over iClone scene lights via a mobile app.
 
 ### Release Notes
 
