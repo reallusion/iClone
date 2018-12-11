@@ -1,11 +1,10 @@
-# Layer Manager
+# Group Manager
 
 ### Version: 0.8.3 (in progress)
 
 ### Introduction
 
-Layer Manager is a utility that creates layer controls for iClone. When Using Layer Manager - every object that is created within iClone is placed on a Layer - 
-each object defaults to the World Layer. Each layer has it's own properties - and each object assumes the properties of the layer it exists on. Layers can easily be hidden or other operations.
+Group Manager is a utility that creates layer controls for iClone. When using Group Manager, every object that is created within iClone is placed under a group - usually the World group. Each group has it's own properties - and each object assumes the properties of the group it exists under. Group can operate on its child elements in a single operation such as toggling visibility.
 
 ### Release Notes
 
