@@ -23,14 +23,13 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
         
         #-----Get all avatar / prop / camera / light-----
         self.scene_objects = RLPy.RScene.FindObjects( RLPy.EObjectType_Avatar | RLPy.EObjectType_Prop | RLPy.EObjectType_Light | RLPy.EObjectType_Camera )
-        
         self.items_dict = {} 
-        
+
         #-----QTreeWidgetItem Property settings-----
         self.default_item = QtWidgets.QTreeWidgetItem()
-        self.default_item.setText(0, "0(default)")
-        self.items_dict["0(default)"] = {}
-        self.items_dict["0(default)"]["0(default)"] = self.default_item
+        self.default_item.setText(0, "Layer_0")
+        self.items_dict["Layer_0"] = {}
+        self.items_dict["Layer_0"]["Layer_0"] = self.default_item
         self.default_item.setCheckState(0,Qt.Checked)
         self.addTopLevelItem(self.default_item)
         self.default_item.setFlags(self.default_item.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable)
@@ -43,7 +42,7 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
             temp_item.setCheckState(0,Qt.Checked)
             temp_item.setFlags(temp_item.flags() & ~Qt.ItemIsDropEnabled)
 
-            self.items_dict["0(default)"][_name] = temp_item
+            self.items_dict["Layer_0"][_name] = temp_item
             self.default_item.addChild(temp_item)
             temp_item.setFlags(temp_item.flags() | Qt.ItemIsUserCheckable)
 
@@ -73,14 +72,20 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
 
     def create_new_layer(self):
         item = QtWidgets.QTreeWidgetItem()
-        item.setText(0, 'Layer001')
+        layer_name = 'Layer_'+str(len(self.items_dict))
+        
+        for k,v in self.items_dict.items():
+            if (k == layer_name):
+                layer_name = 'Layer_'+str(len(self.items_dict)+1)
+        
+        item.setText(0, layer_name)
         item.setCheckState(0,Qt.Checked)
 
         item.setFlags(item.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable | Qt.ItemIsEditable )
 
         self.addTopLevelItem(item)
-        self.items_dict["Layer001"] = {}
-        self.items_dict["Layer001"]["Layer001"] = item
+        self.items_dict[layer_name] = {}
+        self.items_dict[layer_name][layer_name] = item
 
 def run_script(): 
     global layer_manager_dlg
@@ -91,7 +96,20 @@ def run_script():
     
     main_pyside_dlg = wrapInstance(int(layer_manager_dlg.GetWindow()), QtWidgets.QDockWidget)
     
-    main_pyside_dlg.setWidget(layer_manager_tree_widget)
+    main_widget = QtWidgets.QWidget()
+    
+    main_pyside_dlg.setWidget(main_widget)
+    
+    main_widget_layout = QtWidgets.QVBoxLayout()
+    
+    main_widget.setLayout(main_widget_layout)
+    
+    
+    label = QtWidgets.QLabel()
+    label.setText("Right Click on the empty area to create a new layer.\nDrag the node to the new layer.\nDouble Click to rename the layer.")
+    
+    main_widget_layout.addWidget(label)
+    main_widget_layout.addWidget(layer_manager_tree_widget)
     
     layer_manager_dlg.Show()
     
