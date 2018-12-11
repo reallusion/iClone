@@ -1,10 +1,10 @@
-# Batch Render
+# Batch Render Folder
 
 ### Version: 0.8.0 (in progress)
 
 ### Introduction
 
-Batch Render is a utility that can render all project files in the selected folder.
+Batch Render Folder is a utility that can render all project files in the selected folder.
 
 ### Release Notes
 
