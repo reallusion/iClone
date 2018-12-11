@@ -1,10 +1,10 @@
-# Music Controller
+# Synth Keyboard
 
 ### Version: 0.8.1 (in progress)
 
 ### Introduction
 
-Music Controller is a simple case to demonstrate how to use keyboard event to control things.  
+Synth Keyboard is a simple demonstration of using keyboard buttons to control events in iClone (in this case, to play some music notes). 
 
 ### Release Notes
 
