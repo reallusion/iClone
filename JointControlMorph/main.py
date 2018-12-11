@@ -60,7 +60,7 @@ class JcmWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         #add two push buttons
-        self.button_apply = QtWidgets.QPushButton("Apply Joint Ccontrol Morph")
+        self.button_apply = QtWidgets.QPushButton("Apply")
         self.button_cancel = QtWidgets.QPushButton("Cancel")
         #set vertical layout
         self.layout = QtWidgets.QVBoxLayout()
@@ -100,15 +100,19 @@ def run_script():
     global jcm_manager_dlg
     jcm_manager_widget = JcmWidget()
     
+    label = QtWidgets.QLabel()
+    label.setText("The morph is defined by \nThe Script and Morph Creator.")
+    
     #create RDialog
     jcm_manager_dlg = RLPy.RUi.CreateRDialog()
-    jcm_manager_dlg.SetWindowTitle("Joint Control Morph")
+    jcm_manager_dlg.SetWindowTitle("Joint Driven Morph")
     #wrap RDialog to Pyside Dialog
     main_pyside_dlg = wrapInstance(int(jcm_manager_dlg.GetWindow()), QtWidgets.QDialog)
     main_pyside_layout = main_pyside_dlg.layout()
-
+    
+    main_pyside_layout.addWidget(label)
     main_pyside_layout.addWidget(jcm_manager_widget)
-    main_pyside_dlg.setFixedWidth(300)
+    main_pyside_dlg.setFixedWidth(200)
     #show dialog
     jcm_manager_dlg.Show()
     
