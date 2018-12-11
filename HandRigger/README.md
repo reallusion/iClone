@@ -1,10 +1,10 @@
-# Hand Rigger
+# Hand Rig & Gestures
 
 ### Version: 0.9.0 (in progress)
 
 ### Introduction
 
-Hand Rigger is a Python plugin for iClone. You can use it to rig avatar's hand (fingers) among several key poses.
+Hand Rig & Gestures can be used to rig an avatar's fingers and blend their movements among several key poses.
 
 ### Release Notes
 
