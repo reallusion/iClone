@@ -121,7 +121,7 @@ class HandRigger(object):
             if mocap_manager is not None:
                 hand_device.SetEnable(avatar, True)
                 self.initialize_avatar()
-                mocap_manager.Start(RLPy.EMocapState_PreviewWithoutPlay)
+                mocap_manager.Start(RLPy.EMocapState_Preview)
                 self.set_state(HandRiggerState.Running)
 
         elif self.state == HandRiggerState.Running:
