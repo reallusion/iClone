@@ -27,9 +27,9 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
 
         #-----QTreeWidgetItem Property settings-----
         self.default_item = QtWidgets.QTreeWidgetItem()
-        self.default_item.setText(0, "Layer_0")
-        self.items_dict["Layer_0"] = {}
-        self.items_dict["Layer_0"]["Layer_0"] = self.default_item
+        self.default_item.setText(0, "Group_0")
+        self.items_dict["Group_0"] = {}
+        self.items_dict["Group_0"]["Group_0"] = self.default_item
         self.default_item.setCheckState(0,Qt.Checked)
         self.addTopLevelItem(self.default_item)
         self.default_item.setFlags(self.default_item.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable)
@@ -42,7 +42,7 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
             temp_item.setCheckState(0,Qt.Checked)
             temp_item.setFlags(temp_item.flags() & ~Qt.ItemIsDropEnabled)
 
-            self.items_dict["Layer_0"][_name] = temp_item
+            self.items_dict["Group_0"][_name] = temp_item
             self.default_item.addChild(temp_item)
             temp_item.setFlags(temp_item.flags() | Qt.ItemIsUserCheckable)
 
@@ -65,18 +65,18 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
                 
     def context_menu_requested(self, pos):
         _menu = QtWidgets.QMenu()
-        action = QtWidgets.QAction('Create Layer', self)
+        action = QtWidgets.QAction('Create Group', self)
         action.triggered.connect(self.create_new_layer)
         _menu.addAction(action)
         _menu.exec_(self.mapToGlobal(pos))
 
     def create_new_layer(self):
         item = QtWidgets.QTreeWidgetItem()
-        layer_name = 'Layer_'+str(len(self.items_dict))
+        layer_name = 'Group_'+str(len(self.items_dict))
         
         for k,v in self.items_dict.items():
             if (k == layer_name):
-                layer_name = 'Layer_'+str(len(self.items_dict)+1)
+                layer_name = 'Group_'+str(len(self.items_dict)+1)
         
         item.setText(0, layer_name)
         item.setCheckState(0,Qt.Checked)
@@ -92,7 +92,7 @@ def run_script():
     layer_manager_tree_widget = LayerManagerTreeWidget()
     
     layer_manager_dlg = RLPy.RUi.CreateRDockWidget()
-    layer_manager_dlg.SetWindowTitle("Layer Manager")
+    layer_manager_dlg.SetWindowTitle("Group Manager")
     
     main_pyside_dlg = wrapInstance(int(layer_manager_dlg.GetWindow()), QtWidgets.QDockWidget)
     
@@ -106,7 +106,7 @@ def run_script():
     
     
     label = QtWidgets.QLabel()
-    label.setText("Right Click on the empty area to create a new layer.\nDrag the node to the new layer.\nDouble Click to rename the layer.")
+    label.setText("Right click on an empty area to create a new Group.\nYou can drag the nodes to assign Groups.\nDouble-click on the Group label to rename the Group.")
     
     main_widget_layout.addWidget(label)
     main_widget_layout.addWidget(layer_manager_tree_widget)
