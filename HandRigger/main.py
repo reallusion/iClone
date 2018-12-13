@@ -29,8 +29,8 @@ hand_rigger_callback = None
 hand_rigger_callback_list = []
 
 # Hotkey action
-space_action = None
-space_qaction = None
+record_action = None
+record_qaction = None
 blend_action = None
 blend_qaction = None
 
@@ -89,8 +89,10 @@ def show_main_dlg():
     global main_dlg_callback
     global hand_rigger_callback
     global hand_rigger_callback_list
-    global space_action
-    global space_qaction
+    global preview_action
+    global preview_qaction
+    global record_action
+    global record_qaction
     global blend_action
     global blend_qaction
 
@@ -109,12 +111,17 @@ def show_main_dlg():
         register_dialog_callback()
         register_hand_rigger_callback()
 
+        # add hotkey 'P'
+        preview_actions = add_hotkey('P', preview)
+        preview_qaction = preview_actions[0]
+        preview_action = preview_actions[1]
+        preview_action.setEnabled(False)
+
         # add hotkey 'Space'
-        space_actions = add_hotkey('Space', run)
-        space_qaction = space_actions[0]
-        space_action = space_actions[1]
-        space_action.setEnabled(False)
-       
+        record_actions = add_hotkey('Space', record)
+        record_qaction = record_actions[0]
+        record_action = record_actions[1]
+        record_action.setEnabled(False)
 
         # add hotkey 'B'
         blend_actions = add_hotkey('B', switch_blend_mode)
@@ -129,7 +136,8 @@ def show_main_dlg():
         hand_rigger_callback_list = []
 
         # clear hotkeys
-        RLPy.RUi.RemoveHotKey(space_qaction)
+        RLPy.RUi.RemoveHotKey(preview_qaction)
+        RLPy.RUi.RemoveHotKey(record_qaction)
         RLPy.RUi.RemoveHotKey(blend_qaction)
 
         #main_dlg.Hide()
@@ -141,8 +149,10 @@ def show_main_dlg():
         del main_pyside_dlg
         del main_qml
         del qml_module
-        del space_action
-        del space_qaction
+        del preview_action
+        del preview_qaction
+        del record_action
+        del record_qaction
         del blend_action
         del blend_qaction
 
@@ -152,8 +162,10 @@ def show_main_dlg():
         main_pyside_dlg = None
         main_qml = None
         qml_module = None
-        space_action = None
-        space_qaction = None
+        preview_action = None
+        preview_qaction = None
+        record_action = None
+        record_qaction = None
         blend_action = None
         blend_qaction = None
 
@@ -175,7 +187,7 @@ def on_hide():
     global hand_rigger
 
     if hand_rigger is not None:
-        if hand_rigger.get_state() is HandRiggerState.Running:
+        if hand_rigger.get_state() is HandRiggerState.Preview or hand_rigger.get_state() is HandRiggerState.Record:
             set_hand_rigger_state(HandRiggerState.Disable)
         del hand_rigger
         hand_rigger = None
@@ -200,20 +212,40 @@ def set_hand_rigger_state(state):
         main_qml.updateHandRiggerState(hand_rigger.get_state())
 
 def update_hotkey_state():
-    global space_action
+    global preview_action
+    global record_action
     global hand_rigger
 
     if hand_rigger is not None:
         if hand_rigger.get_state() is HandRiggerState.Disable:
-            space_action.setEnabled(False)
+            preview_action.setEnabled(False)
+            record_action.setEnabled(False)
         else:
-            space_action.setEnabled(True)
+            preview_action.setEnabled(True)
+            record_action.setEnabled(True)
 
-def run():
+def preview():
+    global hand_rigger
+    if hand_rigger is not None:
+        if hand_rigger.get_state() == HandRiggerState.Preview or hand_rigger.get_state() == HandRiggerState.Record:
+            run(HandRiggerState.Ready)
+        else:
+            run(HandRiggerState.Preview)
+
+def record():
+    global hand_rigger
+    if hand_rigger is not None:
+        if hand_rigger.get_state() == HandRiggerState.Preview or hand_rigger.get_state() == HandRiggerState.Record:
+            run(HandRiggerState.Ready)
+        else:
+            run(HandRiggerState.Record)
+
+def run(state):
     global main_qml
     global hand_rigger
-    hand_rigger.run()
-    main_qml.updateHandRiggerState(hand_rigger.get_state())
+    if hand_rigger is not None:
+        hand_rigger.run(state)
+        main_qml.updateHandRiggerState(hand_rigger.get_state())
 
 def switch_blend_mode():
     global main_qml

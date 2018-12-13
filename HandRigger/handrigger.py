@@ -17,7 +17,8 @@ NUM_OF_KEYS = 7
 class HandRiggerState(IntEnum):
     Disable = 0
     Ready   = 1
-    Running = 2
+    Preview = 2
+    Record  = 3
 
 class BlendMode(IntEnum):
     InverseSquareDistance = 0
@@ -112,7 +113,7 @@ class HandRigger(object):
 
         self.set_state(HandRiggerState.Disable)
 
-    def run(self):
+    def run(self, state):
         global mocap_manager
         global hand_device
         global avatar
@@ -121,10 +122,14 @@ class HandRigger(object):
             if mocap_manager is not None:
                 hand_device.SetEnable(avatar, True)
                 self.initialize_avatar()
-                mocap_manager.Start(RLPy.EMocapState_Preview)
-                self.set_state(HandRiggerState.Running)
+                if state == HandRiggerState.Preview:
+                    mocap_manager.Start(RLPy.EMocapState_Preview)
+                elif state == HandRiggerState.Record:
+                    print('record')
+                    mocap_manager.Start(RLPy.EMocapState_Record)
+                self.set_state(state)
 
-        elif self.state == HandRiggerState.Running:
+        elif self.state == HandRiggerState.Preview or self.state == HandRiggerState.Record:
             if mocap_manager is not None:
                 mocap_manager.Stop()
                 self.set_state(HandRiggerState.Ready)
