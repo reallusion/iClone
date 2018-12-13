@@ -224,9 +224,9 @@ key_data = {
         -87, 161, 3, 0, 0, 0,
         -89, 161, 3, 0, 0, 0,
         -78, 161, 0, 0, 0, 0,     #right_in_hand_middle
-        -83, 161, 1, 0, 0, 0,
-        -88, 161, 1, 0, 0, 0,
-        -90, 161, 1, 0, 0, 0,
+        -83, 161, 1, 0, 0, 80,
+        -88, 161, 1, 0, 0, 80,
+        -90, 161, 1, 0, 0, 80,
         -78, 161, -0, 0, 0, 0,    #right_in_hand_ring
         -83, 161, -0, 0, 0, 80,
         -86, 161, -0, 0, 0, 80,
@@ -242,7 +242,7 @@ key_data = {
         -81, 161, 3, 0, -50, 0,
         -83, 161, 3, 0, -50, 0,
         -78, 161, 2, 0, 0, 0,     #right_in_hand_index
-        -83, 161, 3, 0, 0, 0,
+        -83, 161, 3, 0,15, 0,
         -87, 161, 3, 0, 0, 0,
         -89, 161, 3, 0, 0, 0,
         -78, 161, 0, 0, 0, 0,     #right_in_hand_middle
@@ -263,13 +263,14 @@ class Keys(object):
     def __init__(self):
         global key_data
         self.key_name_list = [ #7 keys
-            'fist',
-            'paper',
-            'good',
-            'rocker',
-            'gun',
-            'victory',
-            'good' ]
+           'paper',
+           'gun',
+           'victory',
+           'rocker',
+           'index_finger',
+           'fist',
+           'good', 
+           ]
 
     def set_key(self, key_index, key):
         self.key_name_list[key_index] = key

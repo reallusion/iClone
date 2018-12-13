@@ -114,6 +114,7 @@ def show_main_dlg():
         space_qaction = space_actions[0]
         space_action = space_actions[1]
         space_action.setEnabled(False)
+       
 
         # add hotkey 'B'
         blend_actions = add_hotkey('B', switch_blend_mode)
@@ -271,6 +272,12 @@ class HandRigQmlModule(PySide2.QtCore.QObject):
         global hand_rigger
         if hand_rigger is not None:
             return hand_rigger.process_data(square_dist)
+    @PySide2.QtCore.Slot(int)        
+    def set_blend_mode(self, mode):
+        global hand_rigger
+        if hand_rigger is not None:
+            hand_rigger.set_blend_mode(mode)
+            main_qml.setBlendMode(hand_rigger.get_blend_mode())
 
 def run_script():
     initialize_plugin()
