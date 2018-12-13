@@ -29,7 +29,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Place your Batch Render projects in the same folder.</string>
+      <string>Select a folder containing your project file(s):</string>
      </property>
     </widget>
    </item>
