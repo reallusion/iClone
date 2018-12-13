@@ -90,7 +90,7 @@ def do_select_folder():
         ui_lineedit.setText(render_folder)
     ui_render_edit = batch_render_dlg.findChild(PySide2.QtWidgets.QTextEdit, "qtRenderText")
     if ui_render_edit:
-        ui_render_edit.append("%d project files elected" % (len(render_files)))
+        ui_render_edit.append("%d project files selected" % (len(render_files)))
     
 def do_batch_render():
     global render_files
