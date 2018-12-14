@@ -125,7 +125,6 @@ class HandRigger(object):
                 if state == HandRiggerState.Preview:
                     mocap_manager.Start(RLPy.EMocapState_Preview)
                 elif state == HandRiggerState.Record:
-                    print('record')
                     mocap_manager.Start(RLPy.EMocapState_Record)
                 self.set_state(state)
 

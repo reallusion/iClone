@@ -40,7 +40,6 @@ Item {
         anchors.fill: parent
         border.width: 0
 
-
         Label {
             id: label
             y: 0
@@ -55,7 +54,6 @@ Item {
             horizontalAlignment: Text.AlignLeft
             //anchors.verticalCenter: parent.verticalCenter
         }
-
 
         Rectangle {
             id: rectbackground
@@ -73,15 +71,15 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 source: "images/Circle_bg.png"
-           }
-           Canvas {
-               id: canvas
-               anchors.fill: parent
+            }
+            Canvas {
+                id: canvas
+                anchors.fill: parent
 
-               onPaint: {
-                   var ctx = getContext("2d")
-                   // clear
-                   ctx.reset()
+                onPaint: {
+                    var ctx = getContext("2d")
+                    // clear
+                    ctx.reset()
 
                /*    // draw background circle
                    ctx.fillStyle = handRiggerState ? backgroundColor : backgroundDisabledColor
@@ -109,45 +107,45 @@ Item {
                        ctx.stroke()
                    }
                    */
-                   if (handRiggerState >= 2) {
-                       // draw lines
-                       ctx.strokeStyle = lineColor
-                       for (var i=0; i<keys.length; ++i) {
-                           if (weights[i] == 0.0) {
-                               continue
-                           }
-                           ctx.beginPath()
-                           ctx.moveTo(mousePos.x, mousePos.y)
-                           ctx.lineTo(keys[i].x, keys[i].y)
-                           ctx.stroke()
-                       }
-                   }
-               }
+                    if (handRiggerState >= 2) {
+                        // draw lines
+                        ctx.strokeStyle = lineColor
+                        for (var i=0; i<keys.length; ++i) {
+                            if (weights[i] == 0.0) {
+                                continue
+                            }
+                            ctx.beginPath()
+                            ctx.moveTo(mousePos.x, mousePos.y)
+                            ctx.lineTo(keys[i].x, keys[i].y)
+                            ctx.stroke()
+                        }
+                    }
+                }
 
-               MouseArea {
-                   id: ma
-                   hoverEnabled: true
-                   opacity: 0
-                   anchors.fill: parent
-                   cursorShape: Qt.BlankCursor
-                   onPositionChanged:
-                   {
-                       if (handRiggerState >= 2) {
-                           mousePos.x = mouse.x
-                           mousePos.y = mouse.y
+                MouseArea {
+                    id: ma
+                    hoverEnabled: true
+                    opacity: 0
+                    anchors.fill: parent
+                    cursorShape: Qt.BlankCursor
+                    onPositionChanged:
+                    {
+                        if (handRiggerState >= 2) {
+                            mousePos.x = mouse.x
+                            mousePos.y = mouse.y
 
-                           cursor.x = mouse.x-10
-                           cursor.y = mouse.y-10
+                            cursor.x = mouse.x-10
+                            cursor.y = mouse.y-10
 
-                           //label.text = "(" + mouse.x.toString() + ", " + mouse.y.toString() + ")"
-                           for (var i=0; i<keys.length; ++i) {
-                               var x_dist = keys[i].x - mouse.x
-                               var y_dist = keys[i].y - mouse.y
-                               squareDist[i] = x_dist * x_dist + y_dist * y_dist
-                           }
-                           weights = handRigger.process_data(squareDist)
-                       }
-                       canvas.requestPaint()
+                            //label.text = "(" + mouse.x.toString() + ", " + mouse.y.toString() + ")"
+                            for (var i=0; i<keys.length; ++i) {
+                                var x_dist = keys[i].x - mouse.x
+                                var y_dist = keys[i].y - mouse.y
+                                squareDist[i] = x_dist * x_dist + y_dist * y_dist
+                            }
+                            weights = handRigger.process_data(squareDist)
+                        }
+                        canvas.requestPaint()
                     }
                 }
             }
@@ -160,18 +158,11 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source:{
-                        "images/hand07.png"
-                        if(handRiggerState == 0){
-                            "images/hand07_dis.png"
-                        }
-                        if (weights[0] != 0){
-                            "images/hand07_hov.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/hand07_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand07.png" : "images/hand07_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:hand01
                 x: parent.width-hand06.x
@@ -180,18 +171,11 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: {
-                        "images/hand01.png"
-                        if(handRiggerState == 0){
-                            "images/hand01_dis.png"
-                        }
-                        if (weights[6] != 0){
-                            "images/hand01_hov.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/hand01_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand01.png" : "images/hand01_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:hand02
                 x: parent.width-gesturev
@@ -199,18 +183,11 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: {
-                        "images/hand02.png"
-                        if(handRiggerState == 0){
-                            "images/hand02_dis.png"
-                        }
-                        if (weights[1]!= 0){
-                            "images/hand02_hov.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/hand02_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand02.png" : "images/hand02_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:hand03
                 x:parent.width-hand06.x
@@ -218,18 +195,11 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source:{
-                        "images/hand03.png"
-                        if(handRiggerState == 0){
-                            "images/hand03_dis.png"
-                        }
-                        if (weights[2] != 0){
-                            "images/hand03_hov.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/hand03_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand03.png" : "images/hand03_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:hand04
                 x:hand06.x
@@ -237,17 +207,11 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: {"images/hand04.png"
-                        if(handRiggerState == 0){
-                            "images/hand04_dis.png"
-                        }
-                        if (weights[3] != 0){
-                            "images/hand04_hov.png"
-                        }
-                    }
+                    source:  (handRiggerState == 0) ? "images/hand04_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand04.png" : "images/hand04_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:hand05
                 x:parent.width-hand02.x
@@ -256,17 +220,11 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: {"images/hand05.png"
-                        if(handRiggerState == 0){
-                            "images/hand05_dis.png"
-                        }
-                        if (weights[4] != 0){
-                            "images/hand05_hov.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/hand05_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand05.png" : "images/hand05_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:hand06
                 x:gesturex
@@ -274,25 +232,15 @@ Item {
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: {"images/hand06.png"
-                        if(handRiggerState == 0){
-                            "images/hand06_dis.png"
-                        }
-                        if (weights[5]!= 0){
-                            "images/hand06_hov.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/hand06_dis.png" : 
+                        ( (weights[0] == 0) ? "images/hand06.png" : "images/hand06_hov.png" )
                 }
             }
-            
+
             Rectangle{
                 id:cursor
                 Image {
-                    source: {"images/dot_Default.png"
-                        if(handRiggerState == 0){
-                            "images/dot_dis.png"
-                        }
-                    }
+                    source: (handRiggerState == 0) ? "images/dot_dis.png" : "images/dot_Default.png"
                 }
             }
         }
@@ -364,10 +312,11 @@ Item {
         item.enabled = state > 0
         canvas.requestPaint()
     }
+
     function setBlendMode( mode )
     {
-       // labelBlendMode.text = strBlendMode[mode]
-       blendMode = mode
+        // labelBlendMode.text = strBlendMode[mode]
+        blendMode = mode
         twosideModeButton.checked = (blendMode == 1)
         multisideModeButton.checked = (blendMode == 0)
     }
