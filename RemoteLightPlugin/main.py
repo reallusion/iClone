@@ -55,7 +55,7 @@ def initialize_plugin():
     main_pyside_dlg.adjustSize()
 
     # prepare menu and connect action
-    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Remote Light Plugin", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
     plugin_action = plugin_menu.addAction("Remote Light Plugin")
     plugin_action.setIcon((QIcon(res_path+"icon.svg")))
     plugin_action.triggered.connect(show_main_dlg)
