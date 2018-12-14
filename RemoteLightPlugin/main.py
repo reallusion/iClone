@@ -37,7 +37,7 @@ def initialize_plugin():
     global tcp_server
     # Prepare main dialog
     main_dlg = RLPy.RUi.CreateRDialog()
-    main_dlg.SetWindowTitle("Remote Light Plugin")
+    main_dlg.SetWindowTitle("Light Remote Control")
     
     # Create a Pyside2 Quickwidget and get root object from qml
     main_dlg_view = PySide2.QtQuickWidgets.QQuickWidget()
@@ -56,7 +56,7 @@ def initialize_plugin():
 
     # prepare menu and connect action
     plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
-    plugin_action = plugin_menu.addAction("Remote Light Plugin")
+    plugin_action = plugin_menu.addAction("Light Remote Control")
     plugin_action.setIcon((QIcon(res_path+"icon.svg")))
     plugin_action.triggered.connect(show_main_dlg)
     
