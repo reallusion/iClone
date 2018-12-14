@@ -38,11 +38,11 @@ blend_qaction = None
 hand_rigger = None
 
 def initialize_plugin():
-    add_menu('Hand Rigger', 'Hand Rigger', show_main_dlg)
-    print('"Hand Rigger" initialization done!')
+    add_menu('Python Samples', 'Hand Gestures Puppeteering', show_main_dlg)
+    print('"Hand Gestures Puppeteering" initialization done!')
 
 def uninitialize_plugin():
-    print('uninitialize "Hand Rigger"')
+    print('uninitialize "Hand Gestures Puppeteering"')
 
 def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_context_value):
     main_dlg = RLPy.RUi.CreateRDialog()
@@ -99,8 +99,8 @@ def show_main_dlg():
     if main_dlg is None:
         # create dialog
         qml_module = HandRigQmlModule()
-        dialog_globals = create_qml_embedded_dialog('Hand Rigger',
-                                                    'Hand Rigger',
+        dialog_globals = create_qml_embedded_dialog('Hand Gestures Puppeteering',
+                                                    'Hand Gestures Puppeteering',
                                                     '/resource/qml/handrigger.qml',
                                                     'handRigger',
                                                     qml_module)

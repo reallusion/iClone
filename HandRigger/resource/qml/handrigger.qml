@@ -13,7 +13,7 @@ Item {
     property var keyRadius: 6
     property var mousePos: Qt.point(0, 0)
     property var handRiggerState: 0                               // Disable = 0, Ready = 1, Preview = 2, Record = 3
-    property var strReady: qsTr("Select an avater.Press Space to start/stop.\nClick on the buttons,or press hotkey B to select the control mode.")
+    property var strReady: qsTr("Press hotkey [P] to start/stop preview.\nPress Space to start/stop recording.\nClick on the buttons,or press hotkey B to select the control modes.")
     
     property var backgroundColor: Qt.hsla(0.28, 0.9, 0.8, 0.25)   // Qt.hsla: hue, saturation, lightness, alpha
     // another way to set color: Qt.rgba(1.0, 1.0, 1.0, 1.0)
@@ -21,7 +21,8 @@ Item {
     property var backgroundDisabledColor: Qt.hsla(0.28, 0.0, 0.8, 0.25)
     property var keyDisabledFillColor: Qt.hsla(0.055, 0.0, 0.6, 1.0)
     property var keyDisabledStrokeColor: Qt.hsla(0.055, 0.0, 0.4, 1.0)
-    property var lineColor: Qt.hsla(0.0, 0.0, 1, 0.9)
+    property var lineColor: Qt.hsla(0.0, 0.0,0.5, 0.9)
+
 
     property int gesturex:121
     property int gesturey:42
@@ -31,7 +32,7 @@ Item {
     property int blendMode: 1
 
     width: 400
-    height: 400
+    height: 415
     enabled: true
     
     Rectangle {
@@ -58,7 +59,7 @@ Item {
         Rectangle {
             id: rectbackground
             x: 13
-            y: 44
+            y: 60
             color: "transparent"
             border.width: 1
             border.color:"#505050"
@@ -127,7 +128,7 @@ Item {
                     hoverEnabled: true
                     opacity: 0
                     anchors.fill: parent
-                    cursorShape: Qt.BlankCursor
+                    cursorShape:(handRiggerState>=2)? Qt.BlankCursor:Qt.ArrowCursor
                     onPositionChanged:
                     {
                         if (handRiggerState >= 2) {
@@ -151,89 +152,93 @@ Item {
             }
 
             Rectangle{
-                id:hand07
+                id:hand00
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
 
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: (handRiggerState == 0) ? "images/hand07_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand07.png" : "images/hand07_hov.png" )
+                    source:
+                        (handRiggerState == 0) ? "images/hand00_dis.png" :
+                        ( (weights[0] == 0) ? "images/hand00.png" : "images/hand00_hov.png" )
                 }
             }
-
             Rectangle{
                 id:hand01
-                x: parent.width-hand06.x
-                y: hand06.y
-
-                Image {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    source: (handRiggerState == 0) ? "images/hand01_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand01.png" : "images/hand01_hov.png" )
-                }
-            }
-
-            Rectangle{
-                id:hand02
                 x: parent.width-gesturev
                 anchors.verticalCenter: parent.verticalCenter
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: (handRiggerState == 0) ? "images/hand02_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand02.png" : "images/hand02_hov.png" )
+                    source: (handRiggerState == 0) ? "images/hand01_dis.png" :
+                        ( (weights[1] == 0) ? "images/hand01.png" : "images/hand01_hov.png" )
+                }
+            }
+
+
+
+
+            Rectangle{
+                id:hand02
+                x:parent.width-hand03.x
+                y:hand03.y
+                Image {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: (handRiggerState == 0) ? "images/hand02_dis.png" :
+                        ( (weights[2] == 0) ? "images/hand02.png" : "images/hand02_hov.png" )
                 }
             }
 
             Rectangle{
                 id:hand03
-                x:parent.width-hand06.x
-                y:hand04.y
+                x:hand05.x
+                y:parent.height-gesturey2
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: (handRiggerState == 0) ? "images/hand03_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand03.png" : "images/hand03_hov.png" )
+                    source:  (handRiggerState == 0) ? "images/hand03_dis.png" :
+                        ( (weights[3] == 0) ? "images/hand03.png" : "images/hand03_hov.png" )
                 }
             }
 
             Rectangle{
                 id:hand04
-                x:hand06.x
-                y:parent.height-gesturey2
-                Image {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    source:  (handRiggerState == 0) ? "images/hand04_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand04.png" : "images/hand04_hov.png" )
-                }
-            }
-
-            Rectangle{
-                id:hand05
-                x:parent.width-hand02.x
+                x:parent.width-hand01.x
                 anchors.verticalCenter: parent.verticalCenter
 
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: (handRiggerState == 0) ? "images/hand05_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand05.png" : "images/hand05_hov.png" )
+                    source: (handRiggerState == 0) ? "images/hand04_dis.png" :
+                        ( (weights[4] == 0) ? "images/hand04.png" : "images/hand04_hov.png" )
                 }
             }
 
             Rectangle{
-                id:hand06
+                id:hand05
                 x:gesturex
                 y:gesturey
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    source: (handRiggerState == 0) ? "images/hand06_dis.png" : 
-                        ( (weights[0] == 0) ? "images/hand06.png" : "images/hand06_hov.png" )
+                    source: (handRiggerState == 0) ? "images/hand05_dis.png" :
+                        ( (weights[5] == 0) ? "images/hand05.png" : "images/hand05_hov.png" )
+                }
+            }
+
+
+            Rectangle{
+                id:hand06
+                x: parent.width-hand05.x
+                y: hand05.y
+
+                Image {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: (handRiggerState == 0) ? "images/hand06_dis.png" :
+                        ( (weights[6] == 0) ? "images/hand06.png" : "images/hand06_hov.png" )
                 }
             }
 
@@ -247,14 +252,14 @@ Item {
 
         RowLayout{
             x: 13
-            y: 367
+            y: 382
             width: rectbackground.width
             height: 25
             spacing:15
             RLButton{
                 id:twosideModeButton
                 implicitWidth:(parent.width-15)/2
-                text:qsTr("2-Point Mode (b)")
+                text:qsTr("2-Point Blend")
                 checked:true
                 onClicked:{
                     multisideModeButton.checked=false
@@ -266,7 +271,7 @@ Item {
             RLButton{
                 id:multisideModeButton
                 Layout.fillWidth: true
-                text:qsTr("Multi-Point Mode (b)")
+                text:qsTr("Multi-Point Blend")
                 checked:false
                 onClicked:{
                     twosideModeButton.checked=false
