@@ -44,9 +44,20 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
 
             self.items_dict["Group_0"][_name] = temp_item
             self.default_item.addChild(temp_item)
+            #self.default_item.removeChild(temp_item)
             temp_item.setFlags(temp_item.flags() | Qt.ItemIsUserCheckable)
 
         self.itemChanged.connect(self.on_item_changed)
+        
+    def dropEvent(self, evt):
+        item = self.itemAt(evt.pos())
+        super().dropEvent(evt)
+        #print (item)
+        print (self.default_item.childCount())
+        #self.default_item.addChild(self.items_dict["Group_0"]["Ball_000"])
+        #self.clear()
+        #self.insertTopLevelItems(1,self.default_item)
+
     
     def on_item_changed (self, current, previous):
         for key, value in self.items_dict.items():
@@ -65,9 +76,15 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
                 
     def context_menu_requested(self, pos):
         _menu = QtWidgets.QMenu()
-        action = QtWidgets.QAction('Create Group', self)
-        action.triggered.connect(self.create_new_layer)
-        _menu.addAction(action)
+        _item = self.itemAt(pos)
+        if _item:
+            action = QtWidgets.QAction('Delete Group', self)
+            action.triggered.connect(lambda: self.remove_item(_item))
+            _menu.addAction(action)
+        else:
+            action = QtWidgets.QAction('Create Group', self)
+            action.triggered.connect(self.create_new_layer)
+            _menu.addAction(action)
         _menu.exec_(self.mapToGlobal(pos))
 
     def create_new_layer(self):
@@ -87,6 +104,33 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
         self.items_dict[layer_name] = {}
         self.items_dict[layer_name][layer_name] = item
 
+    def remove_item(self, item):
+    
+        if (item.text(0) == "Group_0"):
+            return
+    
+        parent = item.parent()
+        
+        if (item.childCount() == 0 ):
+            parent.takeChild(parent.indexOfChild(item))
+        else:
+            child_list = []
+            for i in range(item.childCount()):
+                #print(item.child(i))
+                temp_item = item.child(i)
+                child_list.append(temp_item)
+                
+            for child in child_list:
+                item.removeChild(child)
+                self.default_item.addChild(child)
+            self.takeTopLevelItem(self.indexOfTopLevelItem(item))
+            
+            try:
+                parent.takeChild(parent.indexOfChild(item))
+            except:
+                pass
+
+        
 def run_script(): 
     global layer_manager_dlg
     layer_manager_tree_widget = LayerManagerTreeWidget()
