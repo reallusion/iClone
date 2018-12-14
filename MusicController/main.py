@@ -25,8 +25,9 @@ class REventCallbackSampleCode(RLPy.REventCallback):
     def __init__(self):
         RLPy.REventCallback.__init__(self)
     def OnPlayed(self):
-        #print('Play')
-        pass
+        global music_controller_widget
+        music_controller_widget.clear_key()
+
     def OnStopped(self):
         global music_controller_widget
         music_controller_widget.record()
@@ -96,7 +97,8 @@ class KeyControlButton(QPushButton):
         control.AddKey(key, RLPy.RGlobal.GetFps())
         control.SetKeyTransition(time, RLPy.ETransitionType_Step, 1.0)
         
-        self.key_list.append(time)
+        if (RLPy.RGlobal.IsPlaying()):
+            self.key_list.append(time)
         
         #RLPy.RAudio.LoadAudioToObject(self.key_prop, self.audio_object, time)
         
@@ -118,10 +120,17 @@ class KeyControlButton(QPushButton):
         control.AddKey(key, RLPy.RGlobal.GetFps())
         control.SetKeyTransition(time, RLPy.ETransitionType_Step, 1.0)
     
+    def clear_key(self):
+        self.key_list = []
+    
     def record(self):
         if (RLPy.RGlobal.IsPlaying() == False):
             for key_time in self.key_list:
-                RLPy.RAudio.LoadAudioToObject(self.key_prop, self.audio_object, key_time)
+                #print (key_time)
+                audio_object = RLPy.RAudio.CreateAudioObject()
+                audio_object.Load(self.audio_path)
+                #print (self.audio_object)
+                RLPy.RAudio.LoadAudioToObject(self.key_prop, audio_object, key_time)
                 #pass
             #print (self.key_list)
         self.key_list = []
@@ -162,6 +171,15 @@ class MusicController(QWidget):
         self.button_h.record()
         self.button_j.record()
     
+    def clear_key(self):
+        self.button_a.clear_key()
+        self.button_s.clear_key()
+        self.button_d.clear_key()
+        self.button_f.clear_key()
+        self.button_g.clear_key()
+        self.button_h.clear_key()
+        self.button_j.clear_key()
+        
     def release_keyboard(self):
         print ("release_keyboard")
         self.releaseKeyboard()
