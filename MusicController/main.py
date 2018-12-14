@@ -14,8 +14,24 @@ from PySide2.shiboken2 import wrapInstance
 
 music_controller_widget = None
 
+event_list = []
+
+event_callback = None
+
 music_controller_dlg = None
 dialog_event_callback = None
+
+class REventCallbackSampleCode(RLPy.REventCallback):
+    def __init__(self):
+        RLPy.REventCallback.__init__(self)
+    def OnPlayed(self):
+        #print('Play')
+        pass
+    def OnStopped(self):
+        global music_controller_widget
+        music_controller_widget.record()
+        #print('Stop')
+        
 
 class DialogEventCallback(RLPy.RDialogCallback):
     def __init__(self):
@@ -24,6 +40,10 @@ class DialogEventCallback(RLPy.RDialogCallback):
     def OnDialogHide(self):
         global music_controller_widget
         music_controller_widget.release_keyboard()
+        global event_list
+        for evt in event_list:
+            RLPy.REventHandler.UnregisterCallback(evt)
+        event_list = []
         pass
 
 
@@ -38,7 +58,11 @@ class KeyControlButton(QPushButton):
         self.key_prop = key_prop
         self.isPressed = False
         
+        self.key_list = []
+        
         self.audio_path = os.path.dirname(os.path.abspath(__file__))+"\\wav\\"+ wav+".wav"
+        self.audio_object = RLPy.RAudio.CreateAudioObject()
+        self.audio_object.Load(self.audio_path)
         
     def mousePressEvent(self, event):
         self.play()
@@ -66,9 +90,15 @@ class KeyControlButton(QPushButton):
         prop_transform.R().SetW(1)
 
         key = RLPy.RTransformKey()
-        key.SetTime(RLPy.RGlobal.GetTime())
+        time = RLPy.RGlobal.GetTime()
+        key.SetTime(time)
         key.SetTransform(prop_transform)
         control.AddKey(key, RLPy.RGlobal.GetFps())
+        control.SetKeyTransition(time, RLPy.ETransitionType_Step, 1.0)
+        
+        self.key_list.append(time)
+        
+        #RLPy.RAudio.LoadAudioToObject(self.key_prop, self.audio_object, time)
         
         QSound.play(self.audio_path)
     
@@ -82,9 +112,19 @@ class KeyControlButton(QPushButton):
         prop_transform.R().SetW(0)
 
         key = RLPy.RTransformKey()
-        key.SetTime(RLPy.RGlobal.GetTime())
+        time = RLPy.RGlobal.GetTime()
+        key.SetTime(time)
         key.SetTransform(prop_transform)
         control.AddKey(key, RLPy.RGlobal.GetFps())
+        control.SetKeyTransition(time, RLPy.ETransitionType_Step, 1.0)
+    
+    def record(self):
+        if (RLPy.RGlobal.IsPlaying() == False):
+            for key_time in self.key_list:
+                RLPy.RAudio.LoadAudioToObject(self.key_prop, self.audio_object, key_time)
+                #pass
+            #print (self.key_list)
+        self.key_list = []
         
 class MusicController(QWidget):
     def __init__(self):
@@ -113,6 +153,15 @@ class MusicController(QWidget):
     
         self.grabKeyboard()
     
+    def record(self):
+        self.button_a.record()
+        self.button_s.record()
+        self.button_d.record()
+        self.button_f.record()
+        self.button_g.record()
+        self.button_h.record()
+        self.button_j.record()
+    
     def release_keyboard(self):
         print ("release_keyboard")
         self.releaseKeyboard()
@@ -139,6 +188,7 @@ def run_script():
     global music_controller_dlg
     global music_controller_widget
     global dialog_event_callback
+    global event_callback
     
     music_controller_widget = MusicController()
     
@@ -157,6 +207,11 @@ def run_script():
     main_pyside_layout.addWidget(music_controller_widget)
     main_pyside_dlg.setFixedWidth(300)
     
+    event_callback = REventCallbackSampleCode()
+    id = RLPy.REventHandler.RegisterCallback(event_callback)
+    global event_list
+    event_list.append(id)
+    #RLPy.REventHandler.UnregisterCallback(id)
     #show dialog
     music_controller_dlg.Show()
 
