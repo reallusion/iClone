@@ -1,0 +1,11 @@
+{
+	"cmds":[
+		{
+			"category":"mesh",
+			"name":"primitive_cube_add",
+			"props":{
+				"name":"test_cube"
+			}
+		}
+	]
+}
