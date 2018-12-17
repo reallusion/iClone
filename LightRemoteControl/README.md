@@ -1,6 +1,6 @@
 # Light Remote Control
 
-### Version: 0.9.0 (in progress)
+### Version: 0.9.1 (in progress)
 
 ### Introduction
 
