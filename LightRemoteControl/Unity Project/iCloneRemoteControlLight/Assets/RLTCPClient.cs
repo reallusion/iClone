@@ -14,6 +14,8 @@ public class RLTCPClient : MonoBehaviour
     private string m_strFromServerData;
     private string m_strIp = "";
     private int m_nPort = 7701;
+    private bool m_bConnected = false;
+    private Action<bool> m_kStatusChangedCallBack = null;
     // Use this for initialization
     void Start()
     {
@@ -26,6 +28,11 @@ public class RLTCPClient : MonoBehaviour
 
     }
 
+    public void SetStatusChangedCallBack( Action<bool> kCallBack )
+    {
+        m_kStatusChangedCallBack = kCallBack;
+    }
+    
     public void SetIp( string strIp )
     {
         m_strIp = strIp;
@@ -55,6 +62,17 @@ public class RLTCPClient : MonoBehaviour
     {
         try
         {
+            if( m_kClient != null )
+            {
+                if ( m_kClient.Connected != m_bConnected )
+                {
+                    m_bConnected = m_kClient.Connected;
+                    if( m_kStatusChangedCallBack != null )
+                    {
+                        m_kStatusChangedCallBack( m_bConnected );
+                    }
+                }
+            }
             Byte[] kBytes = new Byte[ 1024 ];
             while( true )
             {
