@@ -1,10 +1,10 @@
-# Hand Rig & Gestures
+# Hand Gestures Puppeteering
 
 ### Version: 0.9.0 (in progress)
 
 ### Introduction
 
-Hand Rig & Gestures can be used to rig an avatar's fingers and blend their movements among several key poses.
+Hand Gestures Puppeteering can be used to rig an avatar's fingers and blend their movements among several key poses.
 
 ### Release Notes
 
