@@ -77,7 +77,6 @@ def initialize_plugin():
         plugin_menu.setObjectName("pysample_menu")
         
     plugin_action = plugin_menu.addAction("Light Remote Control")
-    plugin_action.setIcon((QIcon(res_path+"icon.svg")))
     plugin_action.triggered.connect(show_main_dlg)
     
     main_qml.setIpAddress(socket.gethostbyname(socket.gethostname()))
