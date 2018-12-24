@@ -56,9 +56,6 @@ def initialize_plugin():
     add_menu('Python Samples', 'Hand Gestures Puppeteering', show_main_dlg)
     print('"Hand Gestures Puppeteering" initialization done!')
 
-def uninitialize_plugin():
-    print('uninitialize "Hand Gestures Puppeteering"')
-
 def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_context_value):
     main_dlg = RLPy.RUi.CreateRDialog()
     main_dlg.SetWindowTitle(title)                                      #title
