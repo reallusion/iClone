@@ -86,8 +86,13 @@ def create_qml_embedded_dialog(title, obj_name, qml_file, qml_context_name, qml_
     return [main_dlg, main_pyside_dlg, main_qml]
 
 def add_menu(menu_title, action_name, trigger_func):
-    menu = wrapInstance(int(RLPy.RUi.AddMenu(menu_title, RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
-    menu_action = menu.addAction(action_name)
+    ic_dlg = wrapInstance(int(RLPy.RUi.GetMainWindow()), PySide2.QtWidgets.QMainWindow)
+    plugin_menu = ic_dlg.menuBar().findChild(PySide2.QtWidgets.QMenu, "pysample_menu")
+    if (plugin_menu == None):
+        plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+        plugin_menu.setObjectName("pysample_menu")
+        
+    menu_action = plugin_menu.addAction(action_name)
     menu_action.triggered.connect(trigger_func)
 
 def add_hotkey(hotkey, trigger_func):
