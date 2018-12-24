@@ -43,9 +43,6 @@ def initialize_plugin():
     batch_render_action.setObjectName("batch_render_action")
     batch_render_action.triggered.connect(show_dialog)
 
-def uninitialize_plugin():
-    print("uninitialize_plugin")
-
 def show_dialog():
     global batch_render_dlg
     global render_files
