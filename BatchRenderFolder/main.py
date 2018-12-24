@@ -33,9 +33,15 @@ render_files = []       # render files (.iPoject)
 
 def initialize_plugin():
     # Add menu
-    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
-    plugin_action = plugin_menu.addAction("Batch Render")
-    plugin_action.triggered.connect(show_dialog)
+    ic_dlg = wrapInstance(int(RLPy.RUi.GetMainWindow()), PySide2.QtWidgets.QMainWindow)
+    plugin_menu = ic_dlg.menuBar().findChild(PySide2.QtWidgets.QMenu, "pysample_menu")
+    if (plugin_menu == None):
+        plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+        plugin_menu.setObjectName("pysample_menu")
+
+    batch_render_action = plugin_menu.addAction("Batch Render Folder")
+    batch_render_action.setObjectName("batch_render_action")
+    batch_render_action.triggered.connect(show_dialog)
 
 def uninitialize_plugin():
     print("uninitialize_plugin")
