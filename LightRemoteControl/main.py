@@ -70,7 +70,12 @@ def initialize_plugin():
     main_pyside_dlg.adjustSize()
 
     # prepare menu and connect action
-    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+    ic_dlg = wrapInstance(int(RLPy.RUi.GetMainWindow()), PySide2.QtWidgets.QMainWindow)
+    plugin_menu = ic_dlg.menuBar().findChild(PySide2.QtWidgets.QMenu, "pysample_menu")
+    if (plugin_menu == None):
+        plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+        plugin_menu.setObjectName("pysample_menu")
+        
     plugin_action = plugin_menu.addAction("Light Remote Control")
     plugin_action.setIcon((QIcon(res_path+"icon.svg")))
     plugin_action.triggered.connect(show_main_dlg)
