@@ -18,6 +18,7 @@ import os
 import socket
 import RLPy
 import PySide2
+from PySide2 import *
 from PySide2.QtCore import *
 from PySide2.QtCore import QResource
 from PySide2.QtGui import *
