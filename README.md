@@ -6,8 +6,8 @@ From this repository you can use Reallusion offical sample code.
 
 We have a heap of documentation available for the Python Script on the web. If you're looking for the answer to something, you may want to start here:
 
-- iClone Python API Reference
-- Reallusion iClone forum
+- [iClone Python API Reference](https://www.google.com)
+- [Reallusion iClone forum](https://forum.reallusion.com/iClone/Plugin-Developer-Python-Open-API)
 
 If you need more, just ask! A lot of Reallusion developers hang out on the forum, and we're proud to be part of a well-meaning, friendly and welcoming community of thousands.
 
