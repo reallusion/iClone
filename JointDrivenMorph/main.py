@@ -74,8 +74,10 @@ class JcmWidget(QtWidgets.QWidget):
     global timer_callback
     def __init__(self):
         super().__init__()
+        self.label = QtWidgets.QLabel()
+        self.label.setText("")
         #add two push buttons
-        self.button_apply = QtWidgets.QPushButton("Apply")
+        self.button_apply = QtWidgets.QPushButton("Apply Joint Morph Connection")
         self.button_cancel = QtWidgets.QPushButton("Cancel")
         #set vertical layout
         self.layout = QtWidgets.QVBoxLayout()
@@ -116,7 +118,7 @@ def run_script():
     jcm_manager_widget = JcmWidget()
     
     label = QtWidgets.QLabel()
-    label.setText("The morph is defined by \nThe Script and Morph Creator.")
+    label.setText("Morph Targets are defined within the script and Morph Creator.")
     
     #create RDialog
     jcm_manager_dlg = RLPy.RUi.CreateRDialog()
@@ -127,7 +129,7 @@ def run_script():
     
     main_pyside_layout.addWidget(label)
     main_pyside_layout.addWidget(jcm_manager_widget)
-    main_pyside_dlg.setFixedWidth(200)
+    main_pyside_dlg.setFixedWidth(400)
     #show dialog
     jcm_manager_dlg.Show()
     
