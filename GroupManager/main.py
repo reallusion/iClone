@@ -13,10 +13,20 @@
 # limitations under the License.
 # ==============================================================================
 
+import os
+from os import listdir
+from os.path import isfile, join
+import sys
 import RLPy
+import PySide2
 from PySide2 import *
-from PySide2 import QtWidgets
-from PySide2.QtCore import Qt
+from PySide2.QtCore import *
+from PySide2.QtCore import QResource
+from PySide2.QtCore import QFile
+from PySide2.QtCore import QIODevice
+from PySide2.QtGui import *
+from PySide2.QtUiTools import QUiLoader
+from PySide2.QtWidgets import *
 from PySide2.shiboken2 import wrapInstance
 
 #create main dialog
@@ -146,8 +156,7 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
             except:
                 pass
 
-        
-def run_script(): 
+def init_dialog(): 
     global layer_manager_dlg
     layer_manager_tree_widget = LayerManagerTreeWidget()
     
@@ -170,6 +179,28 @@ def run_script():
     
     main_widget_layout.addWidget(label)
     main_widget_layout.addWidget(layer_manager_tree_widget)
+
+    #layer_manager_dlg.Show()
+                
+def initialize_plugin():
     
+    # Add menu
+    ic_dlg = wrapInstance(int(RLPy.RUi.GetMainWindow()), PySide2.QtWidgets.QMainWindow)
+    plugin_menu = ic_dlg.menuBar().findChild(PySide2.QtWidgets.QMenu, "pysample_menu")
+    if (plugin_menu == None):
+        plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), PySide2.QtWidgets.QMenu)
+        plugin_menu.setObjectName("pysample_menu")
+
+    group_manager_action = plugin_menu.addAction("Group Manager")
+    group_manager_action.setObjectName("group_manager_action")
+    group_manager_action.triggered.connect(show_dialog)
+
+    init_dialog()
+    
+def show_dialog():
+    global layer_manager_dlg
     layer_manager_dlg.Show()
+    
+def run_script():
+    initialize_plugin()
     
