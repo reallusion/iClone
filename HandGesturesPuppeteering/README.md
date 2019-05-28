@@ -6,6 +6,12 @@
 
 Hand Gestures Puppeteering can be used to rig an avatar's fingers and blend their movements among several key poses.
 
+### Installation
+
+1. Clone or download the Reallusion/iClone GitHub.
+2. Copy **HandGesturesPuppeteering** folder into the iClone install directory > **...\Bin64\OpenPlugin**.
+3. Load the script into the project from the menu: **Plugins > Python Samples > Hand Gestures Puppeteering**.
+
 ### Release Notes
 
 Please see the CHANGES.current file for a detailed list of bug fixes and
