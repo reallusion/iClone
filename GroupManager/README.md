@@ -6,6 +6,12 @@
 
 Group Manager is a utility that creates layer controls for iClone. When using Group Manager, every object that is created within iClone is placed under a group - usually the World group. Each group has it's own properties - and each object assumes the properties of the group it exists under. Group can operate on its child elements in a single operation such as toggling visibility.
 
+### Installation
+
+1. Clone or download the Reallusion/iClone GitHub.
+2. Copy **HandGesturesPuppeteering** folder into the iClone install directory > **...\Bin64\OpenPlugin**.
+3. Load the script into the project from the menu: **Plugins > Python Samples > Hand Gestures Puppeteering**.
+
 ### Release Notes
 
 Please see the CHANGES.current file for a detailed list of bug fixes and
