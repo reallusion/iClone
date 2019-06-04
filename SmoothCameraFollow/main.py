@@ -129,13 +129,18 @@ def scf_setup():
 
 
 def initialize_plugin():
-    # Create Pyside layout for QMenu named "Python Samples" and attach it to the Plugins menu
-    plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu(
-        "Python Samples", RLPy.EMenu_Plugins)), QtWidgets.QMenu)
-    # Add the "Smooth Camera Follow" menu item to Plugins > Python Samples
-    plugin_action = plugin_menu.addAction("Smooth Camera Follow")
+    # Create Pyside interface with iClone main window
+    ic_dlg = wrapInstance(int(RLPy.RUi.GetMainWindow()), QtWidgets.QMainWindow)
+    # Check if the menu item exists
+    plugin_menu = ic_dlg.menuBar().findChild(QtWidgets.QMenu, "pysample_menu")
+    if (plugin_menu == None):
+        # Create Pyside layout for QMenu named "Python Samples" and attach it to the Plugins menu
+        plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), QtWidgets.QMenu)
+        plugin_menu.setObjectName("pysample_menu") # Setting an object name for the menu is equivalent to giving it an ID
+     # Add the "Smooth Camera Follow" menu item to Plugins > Python Samples
+    menu_action = plugin_menu.addAction("Smooth Camera Follow")
     # Show the dialog window when the menu item is triggered
-    plugin_action.triggered.connect(show_dialog)
+    menu_action.triggered.connect(show_dialog)
 
 
 def show_dialog():
