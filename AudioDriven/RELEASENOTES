@@ -1,0 +1,9 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
+Release Notes
+=============
+
+AudioDriven-1.0.0 summary:
+- First official commit of AD_Extension.py and main.pay
