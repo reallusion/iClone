@@ -1,8 +1,8 @@
 # iClone
 
-Welcome to the iClone Python sample code!
+Welcome to the iClone Python sample code GitHub!
 
-From this repository you can use Reallusion offical sample code.
+From this repository you access Reallusion offical Python sample codes.
 
 We have a heap of documentation available for the Python Script on the web. If you're looking for the answer to something, you may want to start here:
 
