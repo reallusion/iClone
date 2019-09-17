@@ -230,7 +230,9 @@ def register_events():
 
     # Register timer callback for auto-focus updates
     caf_callbacks["timer"] = RLPy.RPyTimer()
-    caf_callbacks["timer"].SetInterval(16)  # Every frame of iClone is 16.66667 ms
+    # Every frame of iClone is 16.66667 ms, which is an interval of 16
+    # We can capture a key every 20 frames to prevent heavy scenes from freezing
+    caf_callbacks["timer"].SetInterval(320)
     caf_callbacks["timer_callback"] = AutoFocusTimerCallback()
     caf_callbacks["timer"].RegisterPyTimerCallback(caf_callbacks["timer_callback"])
     caf_callbacks["timer"].Start()
