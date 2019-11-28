@@ -1,0 +1,8 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current and CHANGES files.
+
+Release Notes
+=============
+
+Camera_Dolly_Zoom-1.0.0 summary:
+- First official commit of Camera_Dolly_Zoom.ui and main.py
