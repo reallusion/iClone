@@ -226,6 +226,13 @@ def key_camera_distance():
     t_data_block.SetData("Position/PositionZ", end_time, RLPy.RVariant(end_position.z))
     t_control.SetKeyTransition(end_time, RLPy.ETransitionType_Linear, 1.0)
 
+    # The focal-length parameter must be keyed on every frame because it uses a preconfigured transition curve that is inaccessible
+    for i in range(cdz_ui["widget"].frameDuration.value()+1):
+        ratio = i/cdz_ui["widget"].frameDuration.value()
+        focal_length = lerp(start_focal_length, cdz_ui["widget"].targetFocalLength.value(), ratio)
+        time = RLPy.RTime().IndexedFrameTime(start_frame + i, fps)
+        camera.SetFocalLength(time, focal_length)
+
     # DOF keys for Focus Distance (optional)
     if cdz_ui["widget"].keyFocusDistance.isChecked():
         dof = camera.GetDOFData()
@@ -242,13 +249,6 @@ def key_camera_distance():
         dof.SetFocus(-(start_distance + end_distance))
         key.SetTime(end_time)
         camera.AddDofKey(key, dof)
-
-    # The focal-length parameter must be keyed on every frame because it uses a preconfigured transition curve that is inaccessible
-    for i in range(cdz_ui["widget"].frameDuration.value()+1):
-        ratio = i/cdz_ui["widget"].frameDuration.value()
-        focal_length = lerp(start_focal_length, cdz_ui["widget"].targetFocalLength.value(), ratio)
-        time = RLPy.RTime().IndexedFrameTime(start_frame + i, fps)
-        camera.SetFocalLength(time, focal_length)
 
     # Record custom operation for undo
     record_operation(camera, current_time, cdz_ui["widget"].frameDuration.value(), fps)
@@ -290,11 +290,6 @@ def undo_last_operation():
     key.SetTime(end_time)
     cdz_undo["camera"].RemoveDofKey(key)
 
-    # Revert to original DOF settings
-    dof_key = RLPy.RKey()
-    dof_key.SetTime(cdz_undo["start_time"])
-    cdz_undo["camera"].AddDofKey(dof_key, cdz_undo["start_dof"])
-
     # Remove all focus length keys
     start_focal_length = cdz_undo["camera"].GetFocalLength(cdz_undo["start_time"])
 
@@ -305,9 +300,10 @@ def undo_last_operation():
     # Revert to original Focal Length settings
     cdz_undo["camera"].SetFocalLength(cdz_undo["start_time"], start_focal_length)
 
-    # Reset the time to when the operation was executed
-    RLPy.RGlobal.SetTime(cdz_undo["start_time"])
-
+    # Revert to original DOF settings
+    dof_key = RLPy.RKey()
+    dof_key.SetTime(cdz_undo["start_time"])
+    cdz_undo["camera"].AddDofKey(dof_key, cdz_undo["start_dof"])
 
 def show_help_dialog():
     RLPy.RUi.ShowMessageBox(
