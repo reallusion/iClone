@@ -12,7 +12,7 @@ Please see the CHANGES.current file for a detailed list of bug fixes and
 new features for the current release. The CHANGES file contains bug fixes
 and new features for older versions.
 
-### iClone Version : 7.71
+### iClone Version : 7.7
 
 
  -- Reallusion Maintainers
