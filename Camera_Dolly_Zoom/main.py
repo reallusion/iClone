@@ -115,12 +115,7 @@ class DialogEventCallback(RLPy.RDialogCallback):
         pass
 
     def OnDialogClose(self):
-        global cdz_callbacks, cdz_ui
-
         cdz_callbacks["timer"].UnregisterPyTimerCallback()
-        # Clear all globals
-        cdz_ui.clear()
-        cdz_callbacks.clear()
         return True
 
 
@@ -304,6 +299,7 @@ def undo_last_operation():
     dof_key = RLPy.RKey()
     dof_key.SetTime(cdz_undo["start_time"])
     cdz_undo["camera"].AddDofKey(dof_key, cdz_undo["start_dof"])
+
 
 def show_help_dialog():
     RLPy.RUi.ShowMessageBox(

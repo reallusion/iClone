@@ -6,3 +6,6 @@ Release Notes
 
 Camera_Dolly_Zoom-1.0.0 summary:
 - First official commit of Camera_Dolly_Zoom.ui and main.py
+
+Camera_Dolly_Zoom-1.0.1 summary:
+- Bug fix for 7.8: crash on close.
