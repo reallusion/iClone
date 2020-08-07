@@ -18,25 +18,106 @@
 # Use the Delay value to create a lag between the view and target.
 
 import RLPy
-from PySide2 import QtWidgets
+import os
+from math import *
+from PySide2 import *
 from PySide2.shiboken2 import wrapInstance
 
-# Utilize custom extension functions: more information in Extensions.py
-import Extensions as Ext
+ui = {}  # User interface globals
+events = {}  # Callback event globals
+all_cameras = [None]
+all_props = [None]
 
-# Widgets
-smooth_camera_dock = None
-follow_control = None
-camera_control = None
-delay_control = None
-tautness_control = None
-offset_control = None
-progress_bar = None
-message = None
 
-def look_at_right_handed(view_position, view_target, view_up_vector):
+def lerp(value1, value2, amount):
+    return value1 + (value2 - value1) * amount
+
+
+def vector3_lerp(v3_from, v3_to, x):
+    return RLPy.RVector3(
+        lerp(v3_from.x, v3_to.x, x),
+        lerp(v3_from.y, v3_to.y, x),
+        lerp(v3_from.z, v3_to.z, x)
+    )
+
+
+def transform_lerp(trans_from, trans_to, x):
+    return RLPy.RTransform(  # Scale, Rotation, Translation
+        vector3_lerp(trans_from.S(), trans_to.S(), x),
+        quaternion_lerp(trans_from.R(), trans_to.R(), x),
+        vector3_lerp(trans_from.T(), trans_to.T(), x)
+    )
+
+
+def quaternion_lerp(quat_from, quat_to, f_interpolation):
+    f_invert_interpolation = 1 - f_interpolation
+    q = RLPy.RQuaternion()
+    # Are we on the right (1) side of the graph or the left side (-1)?
+    direction = (((quat_from.x * quat_to.x) + (quat_from.y * quat_to.y)
+                  ) + (quat_from.z * quat_to.z)) + (quat_from.w * quat_to.w)
+    if direction >= 0:
+        q.x = (f_invert_interpolation * quat_from.x) + (f_interpolation * quat_to.x)
+        q.y = (f_invert_interpolation * quat_from.y) + (f_interpolation * quat_to.y)
+        q.z = (f_invert_interpolation * quat_from.z) + (f_interpolation * quat_to.z)
+        q.w = (f_invert_interpolation * quat_from.w) + (f_interpolation * quat_to.w)
+    else:
+        q.x = (f_invert_interpolation * quat_from.x) - (f_interpolation * quat_to.x)
+        q.y = (f_invert_interpolation * quat_from.y) - (f_interpolation * quat_to.y)
+        q.z = (f_invert_interpolation * quat_from.z) - (f_interpolation * quat_to.z)
+        q.w = (f_invert_interpolation * quat_from.w) - (f_interpolation * quat_to.w)
+    # Now that we have the lerped coordinates what side of the graph are we on?
+    side = (((q.x * q.x) + (q.y * q.y)
+             ) + (q.z * q.z)) + (q.w * q.w)
+    # We have to adjust the quaternion values depending on the side we are on
+    orientation = 1 / sqrt((side))
+    q.x *= orientation
+    q.y *= orientation
+    q.z *= orientation
+    q.w *= orientation
+    return q
+
+
+class EventCallback(RLPy.REventCallback):
+    def __init__(self):
+        RLPy.REventCallback.__init__(self)
+
+    def OnObjectAdded(self):
+        update_ui()
+
+    def OnObjectDeleted(self):
+        update_ui()
+
+
+class DialogCallback(RLPy.RDialogCallback):
+
+    def __init__(self):
+        RLPy.RDialogCallback.__init__(self)
+        self.__closed = False
+
+    def OnDialogHide(self):
+        global events
+        if self.__closed:
+            RLPy.REventHandler.UnregisterCallback(events["callback_id"])
+            events.clear()
+            ui.clear()
+
+    def OnDialogShow(self):
+        try:
+            global ui
+            if "dialog" in ui and "window" in ui:
+                if ui["window"].IsFloating():
+                    ui["dialog"].adjustSize()
+        except Exception as e:
+            print(e)
+
+    def OnDialogClose(self):
+        self.__closed = True
+        return True
+
+
+def look_at_right_handed(view_position, view_target, view_up_vector, lookup_offset=0):
     # Look at takes two positional vectors and calculates the facing direction
-    forward = (view_position - view_target)
+    forward = (view_position - view_target) - RLPy.RVector3(0, 0, lookup_offset)
     forward.Normalize()
     right = view_up_vector.Cross(forward)
     right.Normalize()
@@ -50,82 +131,87 @@ def look_at_right_handed(view_position, view_target, view_up_vector):
 
 def destination_transform():
     # Destination transform is where the camera/view should be at when aligned with the target prop
-    # Retrieve RIObject for the camera and the target prop
-    prop = follow_control.value
-    camera = camera_control.value
+    global ui
+
+    prop_transform = all_props[ui["widget"].prop.currentIndex()].WorldTransform()
     # Position vector is where the prop is plus the offset values
-    pos = prop.WorldTransform().T() + offset_control.value
+    pos = prop_transform.T() + RLPy.RVector3(ui["widget"].offset_x.value(), ui["widget"].offset_y.value(), ui["widget"].offset_z.value())
     # Orientation matrix is the camera/view facing the prop position
-    orientation = look_at_right_handed(
-        pos, prop.WorldTransform().T(), Ext.Vector3.up)
+    orientation = look_at_right_handed(pos, prop_transform.T(), RLPy.RVector3(0, 0, 1), ui["widget"].elevation.value())
     # Extrapolate the Quaternion rotations from the orientation matrix
     rot = RLPy.RQuaternion().FromRotationMatrix(orientation)
     # Return a Transform class with scale, rotation, and positional values
-    return RLPy.RTransform(Ext.Vector3.one, rot, pos)
+    return RLPy.RTransform(RLPy.RVector3(1, 1, 1), rot, pos)
 
 
 def key_camera():
+    global ui
 
-    # Store a convenient custom timeline object
-    timeline = Ext.TimeLine()
-    key_interval = delay_control.value
+    # Get the frame and time duration of the target prop only
+    fps = RLPy.RGlobal.GetFps()
+    start_time = RLPy.RTime.IndexedFrameTime(ui["widget"].start_frame.value(), fps)
+    end_time = RLPy.RTime.IndexedFrameTime(ui["widget"].end_frame.value(), fps)
+
     # How many keys are needed to create the whole animation from start to finish?
-    total_keys = int(RLPy.RMath.Ceil(
-        (timeline.end_frame - timeline.start_frame) / key_interval))
+    key_interval = ui["widget"].delay.value()
+    total_keys = int(RLPy.RMath.Ceil((ui["widget"].end_frame.value() - ui["widget"].start_frame.value()) / key_interval))
+
     # Show the progress bar
-    progress_bar.setRange(0, total_keys)
-    progress_bar.setHidden(False)
-    message.setHidden(True)
+    ui["widget"].progress.setRange(0, total_keys)
+    ui["widget"].progress.setHidden(False)
+    ui["widget"].message.setHidden(True)
+
+    camera = all_cameras[ui["widget"].camera.currentIndex()]
 
     # Iterate over every keyframe
     for key in range(0, total_keys):
-        current_frame = timeline.start_frame + key * key_interval
-        current_time = timeline.IndexedFrameTime(current_frame)
-        view_transform = camera_control.value.WorldTransform()
+        current_frame = ui["widget"].start_frame.value() + key * key_interval
+        current_time = RLPy.RTime.IndexedFrameTime(int(current_frame), fps)
+        view_transform = camera.WorldTransform()
         target_transform = destination_transform()
         # Step forward in the timeline
         RLPy.RGlobal.SetTime(current_time)
-        progress_bar.setValue(key)
+        ui["widget"].progress.setValue(key)
         # Lerp between the current camera position and its destination using tautness as the interpolate
-        new_transform = Ext.Transform(view_transform).Lerp(
-            target_transform, tautness_control.value)
+        new_transform = transform_lerp(view_transform, target_transform, ui["widget"].tautness.value())
         # Key the camera's transform for animation
-        camera_control.value.GetControl(
-            "Transform").SetValue(current_time, new_transform)
+        camera.GetControl("Transform").SetValue(current_time, new_transform)
+
+    # Post-process frame reduction
+    if ui["widget"].reduction.value() > 0:
+        control = camera.GetControl("Transform")
+        key_count = control.GetKeyCount()
+        interval = ui["widget"].reduction.value() + 1
+        key_times = []
+
+        for index in range(0, key_count):
+            if index % interval != 0:
+                key_times.append(RLPy.RTime())
+                control.GetKeyTimeAt(index, key_times[len(key_times) - 1])
+
+        for time in range(0, len(key_times)):
+            control.RemoveKey(key_times[time])
 
     # Hide the progress bar
-    progress_bar.setHidden(True)
-    message.setHidden(False)
-    progress_bar.reset()
+    ui["widget"].progress.setHidden(True)
+    ui["widget"].message.setHidden(False)
+    ui["widget"].progress.reset()
     # Playback to see the final result
-    RLPy.RGlobal.Play(timeline.start_time, timeline.end_time)
+    RLPy.RGlobal.Play(start_time, end_time)
 
 
-def scf_refresh():
-    # Refresh the UI to include all of the relevant assets in the scene
-    follow_control.refresh()
-    camera_control.refresh()
+def setup():
+    # Stop the timeline playback as foolproof measure
+    RLPy.RGlobal.Stop()
+    # Position the camera/view designated by the offset on the in-mark of the timeline
+    RLPy.RGlobal.SetTime(RLPy.RGlobal.GetStartTime())
+    # camera_controller = camera_control.value.GetControl("Transform")
+    camera_controller = all_cameras[ui["widget"].camera.currentIndex()].GetControl("Transform")
+    camera_controller.ClearKeys()
+    # Position the camera on the start frame
+    camera_controller.SetValue(RLPy.RGlobal.GetStartTime(), destination_transform())
 
-
-def scf_setup():
-    # If the camera/view and follow/target is designated
-    if follow_control.value is not None and camera_control.value is not None:
-        # Stop the timeline playback as foolproof measure
-        RLPy.RGlobal.Stop()
-        # Position the camera/view designated by the offset on the in-mark of the timeline
-        RLPy.RGlobal.SetTime(RLPy.RGlobal.GetStartTime())
-        camera_controller = camera_control.value.GetControl("Transform")
-        camera_controller.ClearKeys()
-        # Position the camera on the start frame
-        camera_controller.SetValue(
-            RLPy.RGlobal.GetStartTime(), destination_transform())
-
-        key_camera()
-
-    else:
-        # Request for the missing camera/view and follow/target assets
-        RLPy.RUi.ShowMessageBox(
-            "Smooth Cam Follow Error", "Please select a Control(Camera) and Follow(Prop) in the scene.", RLPy.EMsgButton_Ok)
+    key_camera()
 
 
 def initialize_plugin():
@@ -133,88 +219,158 @@ def initialize_plugin():
     ic_dlg = wrapInstance(int(RLPy.RUi.GetMainWindow()), QtWidgets.QMainWindow)
     # Check if the menu item exists
     plugin_menu = ic_dlg.menuBar().findChild(QtWidgets.QMenu, "pysample_menu")
-    if (plugin_menu == None):
+    if plugin_menu is None:
         # Create Pyside layout for QMenu named "Python Samples" and attach it to the Plugins menu
         plugin_menu = wrapInstance(int(RLPy.RUi.AddMenu("Python Samples", RLPy.EMenu_Plugins)), QtWidgets.QMenu)
-        plugin_menu.setObjectName("pysample_menu") # Setting an object name for the menu is equivalent to giving it an ID
-     # Add the "Smooth Camera Follow" menu item to Plugins > Python Samples
+        plugin_menu.setObjectName("pysample_menu")  # Setting an object name for the menu is equivalent to giving it an ID
+    # Add the "Smooth Camera Follow" menu item to Plugins > Python Samples
     menu_action = plugin_menu.addAction("Smooth Camera Follow")
     # Show the dialog window when the menu item is triggered
-    menu_action.triggered.connect(show_dialog)
+    menu_action.triggered.connect(show_window)
 
 
-def show_dialog():
-    global smooth_camera_dock
-    global follow_control
-    global camera_control
-    global delay_control
-    global offset_control
-    global tautness_control
-    global progress_bar
-    global message
+def reset_ui():
+    global ui
+
+    # Dropdowns
+    ui["widget"].camera.setCurrentIndex(0)
+    ui["widget"].prop.setCurrentIndex(0)
+
+    # Sliders
+    ui["widget"].delay.setValue(5)
+    ui["widget"].tautness.setValue(0.5)
+    ui["widget"].reduction.setValue(0)
+
+    # X,Y,Z offset
+    ui["widget"].offset_x.setValue(0)
+    ui["widget"].offset_y.setValue(0)
+    ui["widget"].offset_z.setValue(0)
+    ui["widget"].elevation.setValue(0)
+
+    # Frame Duration
+    start_frame = RLPy.RTime.GetFrameIndex(RLPy.RGlobal.GetStartTime(), RLPy.RGlobal.GetFps())
+    end_frame = RLPy.RTime.GetFrameIndex(RLPy.RGlobal.GetEndTime(), RLPy.RGlobal.GetFps())
+    ui["widget"].start_frame.setValue(start_frame)
+    ui["widget"].end_frame.setValue(end_frame)
+
+    update_ui()
+
+
+def update_ui():
+    global ui, all_cameras, all_props
+
+    current_camera = all_cameras[ui["widget"].camera.currentIndex()]
+    all_cameras = [None]
+    cameras = RLPy.RScene.FindObjects(RLPy.EObjectType_Camera)
+
+    ui["widget"].camera.blockSignals(True)
+    ui["widget"].camera.clear()
+    ui["widget"].camera.addItem("None")
+
+    i = 0
+    for camera in cameras:
+        if camera.GetName() != "Preview Camera":  # Don't include the preview camera
+            all_cameras.append(camera)
+            ui["widget"].camera.addItem(camera.GetName())
+            if camera == current_camera:
+                ui["widget"].camera.setCurrentIndex(i + 1)
+            i += 1
+
+    ui["widget"].camera.blockSignals(False)
+
+    prop = all_props[ui["widget"].prop.currentIndex()]
+    all_props = [None]
+    props = RLPy.RScene.FindObjects(RLPy.EObjectType_Prop)
+
+    ui["widget"].prop.blockSignals(True)
+    ui["widget"].prop.clear()
+    ui["widget"].prop.addItem("None")
+
+    for i in range(len(props)):
+        all_props.append(props[i])
+        ui["widget"].prop.addItem(props[i].GetName())
+        if props[i] == prop:
+            ui["widget"].prop.setCurrentIndex(i + 1)
+
+    ui["widget"].prop.blockSignals(False)
+
+    enabled = True if ui["widget"].prop.currentIndex() > 0 and ui["widget"].camera.currentIndex() > 0 else False
+
+    ui["widget"].follow.setEnabled(enabled)
+    ui["widget"].use_current_offset.setEnabled(enabled)
+
+    calculate_total_keys()
+
+
+def calculate_total_keys():
+    total_keys = (ui["widget"].end_frame.value() - ui["widget"].start_frame.value()) / ui["widget"].delay.value() / (ui["widget"].reduction.value() + 1)
+    ui["widget"].total_keys.setText(f'Total Keys: {int(total_keys) + 1}')
+
+
+def use_current_offset():
+    global ui
+
+    camera_transform = all_cameras[ui["widget"].camera.currentIndex()].WorldTransform()
+    prop_transform = all_props[ui["widget"].prop.currentIndex()].WorldTransform()
+
+    offset = camera_transform.T() - prop_transform.T()
+
+    ui["widget"].offset_x.setValue(offset.x)
+    ui["widget"].offset_y.setValue(offset.y)
+    ui["widget"].offset_z.setValue(offset.z)
+
+
+def show_window():
+    global ui, events
+
+    if "window" in ui:  # If the window already exists...
+        if ui["window"].IsVisible():
+            RLPy.RUi.ShowMessageBox(
+                "Smooth Camera Follow - Operation Error",
+                "The current Smooth Camera Follow session is still running.  You must first close the window to start another session.",
+                RLPy.EMsgButton_Ok)
+        else:
+            ui["window"].Show()
+        return
 
     # Create an iClone Dock Widget
-    smooth_camera_dock = RLPy.RUi.CreateRDockWidget()
-    smooth_camera_dock.SetWindowTitle("Smooth Cam Follow")
-    # Allow this the window to be dockable to the right
-    smooth_camera_dock.SetAllowedAreas(
-        RLPy.EDockWidgetAreas_RightDockWidgetArea)
+    ui["window"] = RLPy.RUi.CreateRDockWidget()
+    ui["window"].SetWindowTitle("Smooth Camera Follow")
+    ui["window"].SetAllowedAreas(RLPy.EDockWidgetAreas_RightDockWidgetArea | RLPy.EDockWidgetAreas_LeftDockWidgetArea)
 
-    # Create Pyside layout for RDockWidget
-    dock = wrapInstance(int(smooth_camera_dock.GetWindow()),
-                        QtWidgets.QDockWidget)
-    main_widget = QtWidgets.QWidget()
-    dock.setWidget(main_widget)
-    dock.setFixedWidth(350)
+    # Load UI file
+    ui_file = QtCore.QFile(os.path.dirname(__file__) + "/Smooth_Camera_Follow.ui")
+    ui_file.open(QtCore.QFile.ReadOnly)
+    ui["widget"] = QtUiTools.QUiLoader().load(ui_file)
+    ui_file.close()
 
-    main_widget_layout = QtWidgets.QVBoxLayout()
-    main_widget.setLayout(main_widget_layout)
+    # Assign the UI file to the Pyside dock widget and show it
+    ui["dialog"] = wrapInstance(int(ui["window"].GetWindow()), QtWidgets.QDockWidget)
+    ui["dialog"].setWidget(ui["widget"])
+    ui["widget"].progress.setHidden(True)
 
-    # Create widgets
-    follow_control = Ext.NodeListComboBoxControl(label="Follow")
+    # Add UI functionality
+    ui["widget"].camera.currentIndexChanged.connect(update_ui)
+    ui["widget"].prop.currentIndexChanged.connect(update_ui)
+    ui["widget"].tautness.valueChanged.connect(lambda x: ui["widget"].tautness_slider.setValue(x * 1000))
+    ui["widget"].tautness_slider.valueChanged.connect(lambda x: ui["widget"].tautness.setValue(x * 0.001))
+    ui["widget"].delay.valueChanged.connect(calculate_total_keys)
+    ui["widget"].start_frame.valueChanged.connect(calculate_total_keys)
+    ui["widget"].end_frame.valueChanged.connect(calculate_total_keys)
+    ui["widget"].reduction.valueChanged.connect(calculate_total_keys)
+    ui["widget"].use_current_offset.clicked.connect(use_current_offset)
+    ui["widget"].reset.clicked.connect(reset_ui)
+    ui["widget"].follow.clicked.connect(setup)
 
-    camera_control = Ext.NodeListComboBoxControl(
-        label="Control", nodeType=RLPy.EObjectType_Camera)
+    # Register events
+    events["callback"] = EventCallback()
+    events["callback_id"] = RLPy.REventHandler.RegisterCallback(events["callback"])
+    events["dialog_callback"] = DialogCallback()
+    ui["window"].RegisterEventCallback(events["dialog_callback"])
 
-    delay_control = Ext.IntSliderControl(label="Frame Delay", span=(1, 30))
-    delay_control.value = 5
-
-    tautness_control = Ext.FloatSliderControl(
-        label="Tautness", span=(0.05, 0.95))
-    tautness_control.value = 0.5
-
-    offset_control = Ext.Vector3Control(label="Offset", maxRange=3000)
-    offset_control.value = RLPy.RVector3(0, -1000, 350)
-
-    reset_button = QtWidgets.QPushButton(text="Refresh")
-    reset_button.clicked.connect(scf_refresh)
-
-    setup_button = QtWidgets.QPushButton(text="Setup")
-    setup_button.clicked.connect(scf_setup)
-
-    progress_bar = QtWidgets.QProgressBar()
-    progress_bar.setTextVisible(True)
-    progress_bar.setHidden(True)
-
-    usage_instructions = """    1) Create a camera and an animated prop.
-    2) Click the [Refresh] button to refresh the UI.
-    3) Choose a Control (Camera) and Follow (Prop).
-    4) Click the [Setup] button.
-    5) Playback the timeline to view the results.
-    6) Adjust Frame Delay, Tautness, and Offset if needed.
-    7) Repeat steps 4 to 6 and adjust to your liking."""
-
-    message = QtWidgets.QLabel(wordWrap=True, text=usage_instructions)
-    message.setStyleSheet("color: grey;")
-
-    # Add all of the widgets in one go
-    for widget in [camera_control, follow_control, delay_control, tautness_control, offset_control, reset_button, setup_button, progress_bar, message]:
-        main_widget_layout.addWidget(widget)
-
-    # Add a stretch space under the other widgets to prevent spacing between the widgets
-    main_widget_layout.addStretch()
-
-    smooth_camera_dock.Show()
+    # Show the UI
+    ui["window"].Show()
+    reset_ui()
 
 
 def run_script():

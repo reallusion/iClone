@@ -1,6 +1,12 @@
 # Smooth Camera Follow
 
+### Version: 2.0.0
+
+Various enhancements, see Release Notes.
+
 ### Version: 1.0.0
+
+Official Release
 
 ### Introduction
 
