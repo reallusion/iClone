@@ -111,6 +111,7 @@ class DialogCallback(RLPy.RDialogCallback):
             print(e)
 
     def OnDialogClose(self):
+        ui["window"].UnregisterAllEventCallbacks()
         self.__closed = True
         return True
 

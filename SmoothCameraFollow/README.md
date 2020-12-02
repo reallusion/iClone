@@ -1,5 +1,9 @@
 # Smooth Camera Follow
 
+### Version: 2.0.1
+
+Executing this script will no longer cause iClone to crash upon exiting the application.
+
 ### Version: 2.0.0
 
 Various enhancements, see Release Notes.
