@@ -7,3 +7,6 @@ Release Notes
 
 Camera_Auto_Focus-1.0.0 summary:
 - First official commit of Camera_Auto_Focus.ui and main.py
+
+Camera_Auto_Focus-1.0.1 summary:
+- Executing this script will no longer cause iClone to crash upon exiting the application.

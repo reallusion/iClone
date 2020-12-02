@@ -1,5 +1,9 @@
 # Camera_Auto_Focus
 
+### Version: 1.0.1
+
+Executing this script will no longer cause iClone to crash upon exiting the application.
+
 ### Version: 1.0.0
 
 ### Introduction

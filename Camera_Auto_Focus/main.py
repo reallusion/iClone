@@ -101,6 +101,7 @@ class DialogEventCallback(RLPy.RDialogCallback):
     def OnDialogClose(self):
         global caf_callbacks
 
+        caf_ui["window"].UnregisterAllEventCallbacks()
         caf_callbacks["timer"].UnregisterPyTimerCallback()
         caf_callbacks["flash_message"].UnregisterPyTimerCallback()
         RLPy.REventHandler.UnregisterCallback(caf_callbacks["events_id"])
