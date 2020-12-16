@@ -2,7 +2,13 @@
 
 ### Version: 2.0.0
 
-Various enhancements, see Release Notes.
+1. Fixed blending errors between the gesture points.
+2. Removed influence on the movement of the wrists.
+3. Three completely new presets: "Standard", "Male", and "Female".
+4. The UI will now store the state of the prior session.
+5. The UI can now return the default factory state, with a press of a button.
+6. Now supports transitioning between the end of the recorded clip and any existing clip in the timeline.
+7. End transition period can be adjusted (number of transition frames).
 
 ### Version: 1.2.0
 
