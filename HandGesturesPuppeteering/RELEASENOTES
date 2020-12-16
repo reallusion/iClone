@@ -5,6 +5,31 @@ and CHANGES files.
 Release Notes
 =============
 
-HandRigger-0.8.0 summary:
+HandRigger-0.9.0 summary:
 - Hand Rigger is a Python plugin for iClone. You can use it to rig avatar's hand (fingers) among several key poses.
 
+HandRigger-1.0.0 summary:
+- Silent initialization: removed Console Log print when loaded.
+- Add separate preview and recording for each hand; Now supports both hands, left, or right hand.
+- Changed recording hotkey to "R" instead of the space bar.
+- Rearranged the user interface by grouping the relevant controls.
+
+HandRigger-1.1.0 summary:
+- Removed individual Preview and Record hotkeys.
+- Added Preview and Record button and activation via the space bar, similar to the Motion Puppet and Direct Puppet tool.
+- Fixed 2-Point blend bug.
+- Fixed left hand capture bug.
+- Blend points are now replaceable with Right Hand, Left Hand, and revertable to Default Gestures.
+- Blend point icons can now be replaced with a screenshot or an existing image file.
+- Blend point data can now save and load via preset files.
+- Blend point icons now scale as the blend weighting increases instead of highlighting in green.
+- UI disabled state is now more obvious and consistent.
+
+HandRigger-2.0 summary:
+- Fixed blending errors between the gesture points.
+- Removed influence on the movement of the wrists.
+- Three completely new presets: "Standard", "Male", and "Female".
+- The UI will now store the state of the prior session.
+- The UI can now return the default factory state, with a press of a button.
+- Now supports transitioning between the end of the recorded clip and any existing clip in the timeline.
+- End transition period can be adjusted (number of transition frames).

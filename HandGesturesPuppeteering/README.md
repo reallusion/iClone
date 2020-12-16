@@ -1,6 +1,24 @@
 # Hand Gestures Puppeteering
 
-### Version: 0.9.0 (in progress)
+### Version: 2.0.0
+
+Various enhancements, see Release Notes.
+
+### Version: 1.2.0
+
+Additional enhancements, see Release Notes.
+
+### Version: 1.1.0
+
+Various bug fixes and enhancements, see Release Notes.
+
+### Version: 1.0.0
+
+Various enhancements, see Release Notes.
+
+### Version: 0.9.0
+
+Official Release
 
 ### Introduction
 
@@ -18,7 +36,18 @@ Please see the CHANGES.current file for a detailed list of bug fixes and
 new features for the current release. The CHANGES file contains bug fixes
 and new features for older versions.
 
-### iClone API Update date: 20181204.1 (in progress)
+### Known Issues
+
+1. Sometimes hand motion capture will erase existing motion clips in the timeline.
+
+2. Gesture adjustment will have a tendency to deviate from the current hand gesture (data inaccuracy). 
+    This affects the following features:
+        - Replace with Right Hand Gesture
+        - Replace with Left Hand Gesture
+
+3. The capture position will snap immediately to the cursor position when a pen tablet is used. Therefore, the transition time can not be controlled like with a mouse.
+
+### iClone API Update date: 20181204.1
 
 
  -- Reallusion Maintainers
