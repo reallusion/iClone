@@ -61,6 +61,7 @@ class MyEventCallback(RLPy.REventCallback):
         self.undo_redo_done_func = None
         self.object_deleted_func = None
         self.object_added_func = None
+        self.hierarchy_changed_func = None
 
     def OnFileLoaded(self, nFileType):
         self.file_loaded_func()
@@ -85,6 +86,12 @@ class MyEventCallback(RLPy.REventCallback):
 
     def register_object_added_func(self, func):
         self.object_added_func = func
+    
+    def OnHierarchyChanged(self):
+        self.hierarchy_changed_func()
+
+    def register_hierarchy_changed_func(self, func):
+        self.hierarchy_changed_func = func
 
 
 class DialogEventCallback(RLPy.RDialogCallback):
@@ -353,7 +360,8 @@ def register_event():
         event_callback.register_undo_redo_done_func(refresh_tree_view)
         event_callback.register_object_deleted_func(refresh_tree_view)
         event_callback.register_object_added_func(refresh_tree_view)
-
+        event_callback.register_hierarchy_changed_func(refresh_tree_view)
+        
         id = RLPy.REventHandler.RegisterCallback(event_callback)
         event_list.append(id)
 
