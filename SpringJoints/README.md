@@ -1,5 +1,9 @@
 # Spring Joints
 
+### Version: 1.0.1
+
+Fixed: Tree view not updating when the object hierarchy changes.
+
 ### Version: 1.0.0
 
 ### Introduction
