@@ -31,6 +31,7 @@ from PySide2.shiboken2 import wrapInstance
 
 #create main dialog
 layer_manger_dlg = None
+layer_manager_tree_widget = None
 
 class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
     def __init__(self):
@@ -46,7 +47,11 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
         #-----Bind context menu event to self.context_menu_requested-----
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.context_menu_requested)
-        
+        self.itemChanged.connect(self.on_item_changed)
+        self.update_scene()
+
+    def update_scene(self):
+        self.clear()
         #-----Get all avatar / prop / camera / light-----
         self.scene_objects = RLPy.RScene.FindObjects( RLPy.EObjectType_Avatar | RLPy.EObjectType_Prop | RLPy.EObjectType_Light | RLPy.EObjectType_Camera )
         self.items_dict = {} 
@@ -72,9 +77,9 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
             self.default_item.addChild(temp_item)
             #self.default_item.removeChild(temp_item)
             temp_item.setFlags(temp_item.flags() | Qt.ItemIsUserCheckable)
-
-        self.itemChanged.connect(self.on_item_changed)
         
+        self.expandItem(self.default_item)
+
     def dropEvent(self, evt):
         item = self.itemAt(evt.pos())
         super().dropEvent(evt)
@@ -158,6 +163,7 @@ class LayerManagerTreeWidget(QtWidgets.QTreeWidget):
 
 def init_dialog(): 
     global layer_manager_dlg
+    global layer_manager_tree_widget
     layer_manager_tree_widget = LayerManagerTreeWidget()
     
     layer_manager_dlg = RLPy.RUi.CreateRDockWidget()
@@ -177,11 +183,21 @@ def init_dialog():
     label = QtWidgets.QLabel()
     label.setText("Right click on an empty area to create a new Group.\nYou can drag the nodes to assign Groups.\nDouble-click on the Group label to rename the Group.")
     
+    button = QtWidgets.QPushButton()
+    button.setText("Update")
+    button.setMinimumSize(25, 25)
+    button.clicked.connect(update_tree_view)
+
     main_widget_layout.addWidget(label)
     main_widget_layout.addWidget(layer_manager_tree_widget)
+    main_widget_layout.addWidget(button)
 
     #layer_manager_dlg.Show()
-                
+
+def update_tree_view():
+    global layer_manager_tree_widget
+    layer_manager_tree_widget.update_scene()
+
 def initialize_plugin():
     
     # Add menu
