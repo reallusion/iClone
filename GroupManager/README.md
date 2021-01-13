@@ -1,5 +1,10 @@
 # Group Manager
 
+### Version: 0.8.5 (in progress)
+
+Added: Function for updating the tree view for the scene object.
+Known Issue: Group settings will reset when the "update" button is pressed
+
 ### Version: 0.8.4 (in progress)
 
 ### Introduction

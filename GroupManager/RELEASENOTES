@@ -4,19 +4,22 @@ and CHANGES files.
 
 Release Notes
 =============
+Group Manager-0.8.5 summary:
+- Add Function for updating the tree view for the scene object.
+* Known Issue: Group settings will reset when the "update" button is pressed.
 
-LayerManager-0.8.4 summary:
+Group Manager-0.8.4 summary:
 - Add Delete Funciton.
 
-LayerManager-0.8.3 summary:
+Group Manager-0.8.3 summary:
 - Adjust Layout and clean code.
 
-LayerManager-0.8.2 summary:
+Group Manager-0.8.2 summary:
 - Fixed Layer check status can't affect child node (object).
 
-LayerManager-0.8.1 summary:
+Group Manager-0.8.1 summary:
 - Add scene show and hide function.
 
-LayerManager-0.8.0 summary:
-- Layer Manager is the Python plugin in iClone, providing
+Group Manager-0.8.0 summary:
+- Group Manager is the Python plugin in iClone, providing
   choose avatar and prop objects to add visible key in current scene time.
