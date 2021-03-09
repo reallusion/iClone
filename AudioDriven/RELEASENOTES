@@ -7,3 +7,6 @@ Release Notes
 
 AudioDriven-1.0.0 summary:
 - First official commit of AD_Extension.py and main.pay
+
+AudioDriven-1.0.1 summary:
+- Solved can't load the "wav" format problem

@@ -1,5 +1,9 @@
 # Audio Driven
 
+### Version: 1.0.1
+
+Fixed:The wav format can't be loading.
+
 ### Version: 1.0.0
 
 ### Introduction

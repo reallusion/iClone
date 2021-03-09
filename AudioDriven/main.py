@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-import os, math, RLPy, wave
+import os, math, RLPy, wave, wavio
 import numpy as np
 from scipy.fftpack import fft
 from PySide2.QtMultimedia import QSound
@@ -117,13 +117,26 @@ def audio_to_spectrogram(path):
     audio_object.Load(path)
 
     # Process the wave audio file
-    wav = wave.open(path, "rb")  # Open the wave file in read-only mode.
-    framerate, nframes = wav.getparams()[2:4]  # Grab sampling frequency and number of frames
-    duration = int(nframes*(1/framerate) * 1000)  # Duration of audio in milliseconds
-    fps_ratio = int(framerate / RLPy.RGlobal.GetFps())  # Wave vs iClone fps ratio, ex: 44100 / 60 = 735
-    wav_bytes = wav.readframes(nframes)  # Reads and returns at most n frames of audio, as a bytes object.
-    wav.close()  # Close the wave file, we don't need it anymore
-    wav_data = np.fromstring(wav_bytes, dtype=np.short)  # Turn 8 bits to a numpy integer array
+    try:
+        wav = wave.open(path, "rb")  # Open the wave file in read-only mode.
+        framerate, nframes = wav.getparams()[2:4]  # Grab sampling frequency and number of frames
+        duration = int(nframes*(1/framerate) * 1000)  # Duration of audio in milliseconds
+        fps_ratio = int(framerate / RLPy.RGlobal.GetFps())  # Wave vs iClone fps ratio, ex: 44100 / 60 = 735
+        wav_bytes = wav.readframes(nframes)  # Reads and returns at most n frames of audio, as a bytes object.
+        sampwidth = wav.getsampwidth()
+        wav.close()  # Close the wave file, we don't need it anymore
+    except Exception as e:
+        RLPy.RUi.ShowMessageBox("File error", str(e), RLPy.EMsgButton_Close)
+
+    
+    wav_data = wavio.read(path).data
+    # print('wave data:', wav_data)
+    # wav_bytes = wav_bytes.replace('\x', ' \x')
+    # wav_data = np.fromstring(wav_bytes, dtype=np.int32)  # Turn 8 bits to a numpy integer array
+    if wav_data.shape[0] * wav_data.shape[1] % 2 != 0:
+        # wav_data = np.append(wav_data, [wav_data[-1]], axis=0)
+        wav_data = np.append(wav_data, np.zeros((1, wav_data.shape[1])), axis=0)
+
     wav_data.shape = -1, 2  # Shape the data into tupples with indefinite rows and 2 columns
     wav_data = wav_data.T  # Turn the 2 separate array data into a single dual channel audio data array
 
@@ -165,17 +178,23 @@ def spectrogram_to_value(value=0):
 
     max_freqs = []
     all_avg_freqs = []
-
+    
+    # print('sum(len(j) for j in all_clones):', sum(len(j) for j in all_clones))
     for i in range(len(audio_spectrogram)):
-        freq_step = 50 // sum(len(i) for i in all_clones)  # 50 is around 3000 Hz on the soundwave, ex: 366 /10 = 36 % 6 without the remainder
+        object_amount = sum(len(j) for j in all_clones)
+        # print('i:', i)
+
+        freq_step = 50 // object_amount   # 50 is around 3000 Hz on the soundwave, ex: 366 /10 = 36 % 6 without the remainder
         avg_freqs = []
-        for x in range(sum(len(i) for i in all_clones)):
+        for x in range(object_amount):
+            # print('x:', x)
             freq = np.mean(audio_spectrogram[i][freq_step * (x+1): freq_step * (x+2)])
             avg_freqs.append(freq)
-        max_freqs.append(max(avg_freqs))
-        all_avg_freqs.append(avg_freqs)
+        if len(avg_freqs) > 0:
+            max_freqs.append(max(avg_freqs))
+            all_avg_freqs.append(avg_freqs)
 
-    amplitude = value / max(max_freqs)
+    amplitude = value / max(max_freqs) if len(max_freqs) else value
     converted_data = []
 
     for k in range(len(all_avg_freqs)):
@@ -213,12 +232,14 @@ def drive_by_audio():
         "y": spectrogram_to_value(ui["move"].value[1]),
         "z": spectrogram_to_value(ui["move"].value[2])
     }
+    # print("audio_move:", audio_move)
 
     audio_scale = {  # Build scale tuples list from the audio data
         "x": spectrogram_to_value(ui["size"].value[0]),
         "y": spectrogram_to_value(ui["size"].value[1]),
         "z": spectrogram_to_value(ui["size"].value[2])
     }
+    # print("audio_scale:", audio_scale)
 
     for c in all_clones:
         for i in range(len(c)):
@@ -265,7 +286,6 @@ def drive_by_audio():
 
     ui["apply"].setVisible(True)
     ui["progress"].setVisible(False)
-
 
 def clone_and_offset():
     global ui, all_items
