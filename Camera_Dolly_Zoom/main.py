@@ -16,7 +16,7 @@
 import RLPy
 import os
 from PySide2 import *
-from PySide2.shiboken2 import wrapInstance
+from shiboken2 import wrapInstance
 
 cdz_ui = {}  # User interface globals
 cdz_callbacks = {}  # Global for callbacks, events, and timers
@@ -171,8 +171,8 @@ def update_focal_length_slider(x):
     camera.SetFocalLength(RLPy.RGlobal.GetTime(), x)
 
     # Force update iClone's native UI
-    RLPy.RGlobal.SetTime(RLPy.RGlobal.GetTime() + RLPy.RTime(1))
-    RLPy.RGlobal.SetTime(RLPy.RGlobal.GetTime() - RLPy.RTime(1))
+    RLPy.RGlobal.SetTime(RLPy.RGlobal.GetTime() + RLPy.RTick.FromMilliSecond(1))
+    RLPy.RGlobal.SetTime(RLPy.RGlobal.GetTime() - RLPy.RTick.FromMilliSecond(1))
 
 
 def update_focal_length(x):
@@ -197,9 +197,9 @@ def key_camera_distance():
     # Assign time and frame variables we'll need to animate the camera
     current_time = RLPy.RGlobal.GetTime()
     fps = RLPy.RGlobal.GetFps()
-    start_frame = RLPy.RTime.GetFrameIndex(current_time, fps)
+    start_frame = RLPy.GetFrameIndex(current_time, fps)
     end_frame = start_frame + cdz_ui["widget"].frameDuration.value()
-    end_time = RLPy.RTime().IndexedFrameTime(end_frame, fps)
+    end_time = RLPy.IndexedFrameTime(end_frame, fps)
 
     # Calculate the offset position for the camera based on the target focal-length
     start_focal_length = camera.GetFocalLength(current_time)
@@ -225,7 +225,7 @@ def key_camera_distance():
     for i in range(cdz_ui["widget"].frameDuration.value()+1):
         ratio = i/cdz_ui["widget"].frameDuration.value()
         focal_length = lerp(start_focal_length, cdz_ui["widget"].targetFocalLength.value(), ratio)
-        time = RLPy.RTime().IndexedFrameTime(start_frame + i, fps)
+        time = RLPy.IndexedFrameTime(start_frame + i, fps)
         camera.SetFocalLength(time, focal_length)
 
     # DOF keys for Focus Distance (optional)
@@ -270,9 +270,9 @@ def undo_last_operation():
             RLPy.EMsgButton_Ok)
         return
 
-    start_frame = RLPy.RTime.GetFrameIndex(cdz_undo["start_time"], cdz_undo["fps"])
+    start_frame = RLPy.GetFrameIndex(cdz_undo["start_time"], cdz_undo["fps"])
     end_frame = start_frame + cdz_undo["frame_range"]
-    end_time = RLPy.RTime().IndexedFrameTime(end_frame, cdz_undo["fps"])
+    end_time = RLPy.IndexedFrameTime(end_frame, cdz_undo["fps"])
 
     # Remove the Camera transform key
     t_control = cdz_undo["camera"].GetControl("Transform")
@@ -289,7 +289,7 @@ def undo_last_operation():
     start_focal_length = cdz_undo["camera"].GetFocalLength(cdz_undo["start_time"])
 
     for i in range(cdz_undo["frame_range"]+1):
-        time = RLPy.RTime().IndexedFrameTime(start_frame + i, cdz_undo["fps"])
+        time = RLPy.IndexedFrameTime(start_frame + i, cdz_undo["fps"])
         cdz_undo["camera"].RemoveFocalLengthKey(time)
 
     # Revert to original Focal Length settings
