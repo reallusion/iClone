@@ -6,7 +6,7 @@ from PySide2 import QtWidgets
 from PySide2 import QtSvg
 from PySide2 import QtGui
 from PySide2.QtCore import Qt
-from PySide2.shiboken2 import wrapInstance
+from shiboken2 import wrapInstance
 
 
 import Extensions as Ext
@@ -428,7 +428,7 @@ def apply_setting():
         if emit:
             if popcorn_name in particle_delay_dic:
                 accumulate_dalay = accumulate_dalay + particle_delay_dic[popcorn_name]
-            popcorn.SetEmit(RLPy.RTime(accumulate_dalay * 1000) + current_time, True)
+            popcorn.SetEmit(RLPy.RTick.FromMilliSecond(accumulate_dalay * 1000) + current_time, True)
 
             is_particle_loop = False
             if popcorn_name in particle_loop_dic:
@@ -450,9 +450,9 @@ def apply_setting():
                     for key_time in particle_emit_key_time_list:
                         repeat_emit_delay_time = repeat_emit_delay_time + key_time
                         if on_off_index % 2 == 0:
-                            popcorn.SetEmit(RLPy.RTime((accumulate_dalay + repeat_emit_delay_time) * 1000) + current_time, False)
+                            popcorn.SetEmit(RLPy.RTick.FromMilliSecond((accumulate_dalay + repeat_emit_delay_time) * 1000) + current_time, False)
                         else:
-                            popcorn.SetEmit(RLPy.RTime((accumulate_dalay + repeat_emit_delay_time) * 1000) + current_time, True)
+                            popcorn.SetEmit(RLPy.RTick.FromMilliSecond((accumulate_dalay + repeat_emit_delay_time) * 1000) + current_time, True)
                         on_off_index = on_off_index + 1
 
         popcorn.Update()

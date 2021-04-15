@@ -24,7 +24,7 @@ import json
 from PySide2 import QtWidgets
 from PySide2.QtCore import *
 from PySide2 import QtCore
-from PySide2.shiboken2 import wrapInstance
+from shiboken2 import wrapInstance
 
 _dockable_areas = {
     "None": RLPy.EDockWidgetAreas_NoDockwidgetArea,
@@ -107,13 +107,13 @@ class TimeLine():
         self.__start_time = RLPy.RGlobal.GetStartTime()
         self.__end_time = RLPy.RGlobal.GetEndTime()
         self.__current_time = RLPy.RGlobal.GetTime()
-        self.__start_frame = RLPy.RTime.GetFrameIndex(
+        self.__start_frame = RLPy.GetFrameIndex(
             self.__start_time, self.__fps)
-        self.__end_frame = RLPy.RTime.GetFrameIndex(
+        self.__end_frame = RLPy.GetFrameIndex(
             self.__end_time, self.__fps)
-        self.__current_frame = RLPy.RTime.GetFrameIndex(
+        self.__current_frame = RLPy.GetFrameIndex(
             self.__current_time, self.__fps)
-        self.__delta_time = 1 / self.__fps
+        self.__delta_time =1/self.__fps.ToFloat()
 
     @property
     def start_frame(self):
@@ -144,7 +144,7 @@ class TimeLine():
         return self.__current_time
 
     def IndexedFrameTime(self, frame_index):
-        return RLPy.RTime.IndexedFrameTime(frame_index, self.__fps)
+        return RLPy.IndexedFrameTime(frame_index, self.__fps)
 
 
 class Vector3(RLPy.RVector3):
@@ -404,7 +404,7 @@ class SkeletonTreeViewControl(QtWidgets.QGroupBox):
 
 class NodeListComboBoxControl(QtWidgets.QGroupBox):
     # This control evaluates the scene for nodes of the specified type and lists them
-    valueChanged = Signal(RLPy._object)
+    valueChanged = Signal(RLPy.RIObject)
     # Default to the prop node type
 
     def __init__(self, label=None, nodeType="Prop", parent=None):
