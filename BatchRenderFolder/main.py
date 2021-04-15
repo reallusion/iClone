@@ -27,7 +27,7 @@ from PySide2.QtCore import QIODevice
 from PySide2.QtGui import *
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import *
-from PySide2.shiboken2 import wrapInstance
+from shiboken2 import wrapInstance
 
 batch_render_dlg = None # batch render dialog
 render_files = []       # render files (.iPoject) 
