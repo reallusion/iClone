@@ -20,7 +20,7 @@ from PySide2.QtMultimedia import QSound
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2 import QtWidgets, QtGui
-from PySide2.shiboken2 import wrapInstance
+from shiboken2 import wrapInstance
 
 # Utilize custom extension functions: more information in AD_Extensions.py
 import AD_Extensions as Ext
@@ -29,6 +29,7 @@ ui = {}  # User Interface
 all_events, dialog_event_callback, event_callback = [], None, None  # Events and callbacks
 all_clones, audio_spectrogram, all_items = [], [], []  # Script related globals
 
+valid_audio = True
 
 class SelectionEventCallback(RLPy.REventCallback):
     def __init__(self):
@@ -101,14 +102,17 @@ def show_dialog():
 
 def check_criteria():
     # Do we meet the criteria for executing this script?
-    global ui
+    global ui, valid_audio
 
     cond = ui["wave_file"].value is not None and len(ui["selection"].value) > 0
-    ui["apply"].setEnabled(cond)
+    if valid_audio:
+        ui["apply"].setEnabled(cond)
+    else:
+        ui["apply"].setEnabled(False)
 
 
 def audio_to_spectrogram(path):
-    global audio_spectrogram
+    global audio_spectrogram, valid_audio
 
     audio_spectrogram.clear()
 
@@ -120,10 +124,18 @@ def audio_to_spectrogram(path):
     wav = wave.open(path, "rb")  # Open the wave file in read-only mode.
     framerate, nframes = wav.getparams()[2:4]  # Grab sampling frequency and number of frames
     duration = int(nframes*(1/framerate) * 1000)  # Duration of audio in milliseconds
-    fps_ratio = int(framerate / RLPy.RGlobal.GetFps())  # Wave vs iClone fps ratio, ex: 44100 / 60 = 735
+    fps_ratio = int(framerate / RLPy.RGlobal.GetFps().ToFloat())  # Wave vs iClone fps ratio, ex: 44100 / 60 = 735
     wav_bytes = wav.readframes(nframes)  # Reads and returns at most n frames of audio, as a bytes object.
     wav.close()  # Close the wave file, we don't need it anymore
     wav_data = np.fromstring(wav_bytes, dtype=np.short)  # Turn 8 bits to a numpy integer array
+
+    if len(wav_data)%2 == 1:
+        valid_audio = False
+        check_criteria()
+        return
+    else:
+        valid_audio = True
+
     wav_data.shape = -1, 2  # Shape the data into tupples with indefinite rows and 2 columns
     wav_data = wav_data.T  # Turn the 2 separate array data into a single dual channel audio data array
 
@@ -167,7 +179,12 @@ def spectrogram_to_value(value=0):
     all_avg_freqs = []
 
     for i in range(len(audio_spectrogram)):
-        freq_step = 50 // sum(len(i) for i in all_clones)  # 50 is around 3000 Hz on the soundwave, ex: 366 /10 = 36 % 6 without the remainder
+        sum_all = sum(len(i) for i in all_clones)
+        if sum_all > 0:
+            freq_step = 50 // sum_all  # 50 is around 3000 Hz on the soundwave, ex: 366 /10 = 36 % 6 without the remainder
+        else:
+            return
+            
         avg_freqs = []
         for x in range(sum(len(i) for i in all_clones)):
             freq = np.mean(audio_spectrogram[i][freq_step * (x+1): freq_step * (x+2)])
@@ -175,7 +192,9 @@ def spectrogram_to_value(value=0):
         max_freqs.append(max(avg_freqs))
         all_avg_freqs.append(avg_freqs)
 
-    amplitude = value / max(max_freqs)
+    if len(max_freqs)>0 and max(max_freqs) != 0:
+        amplitude = value / max(max_freqs)
+
     converted_data = []
 
     for k in range(len(all_avg_freqs)):
@@ -189,7 +208,7 @@ def set_transform_key(clone, time, transform):
     key.SetTime(time)
     key.SetTransform(transform)
     control = clone.GetControl("Transform")
-    control.AddKey(key, RLPy.RGlobal.GetFps())
+    control.AddKey(key)
     control.SetKeyTransition(time, RLPy.ETransitionType_Ease_Out, 1.0)
 
 
@@ -203,7 +222,8 @@ def drive_by_audio():
     all_clones = clone_and_offset()
     final_time = RLPy.RGlobal.GetTime()
     start_time = RLPy.RGlobal.GetTime()
-    start_frame = RLPy.RTime.GetFrameIndex(start_time, RLPy.RGlobal.GetFps())
+    fps = RLPy.RGlobal.GetFps()
+    start_frame = RLPy.GetFrameIndex(start_time, fps)
     ui["progress"].label = "Applying Animations"
     processes = sum(len(i) for i in all_clones) * len(audio_spectrogram)
     progress = 0
@@ -239,28 +259,29 @@ def drive_by_audio():
                     audio_scale["z"][f][i] + transform.S().z if ui["size"].enabled[2] else transform.S().z
                 )
                 frame = start_frame + f + 1  # Shift 1 frame forward
-                time = RLPy.RTime(RLPy.RTime.IndexedFrameTime(frame, RLPy.RGlobal.GetFps()))
+                time = RLPy.IndexedFrameTime(frame, fps)
                 key.SetTime(time)
                 key.SetTransform(animation)
-                control.AddKey(key, RLPy.RGlobal.GetFps())
+                control.AddKey(key)
                 control.SetKeyTransition(time, RLPy.ETransitionType_Linear, 1.0)
                 final_time = time
                 progress += 1
                 ui["progress"].value = progress / processes
 
             if ui["ramp"].enabled:
-                start_time = RLPy.RGlobal.GetTime() - ui["ramp"].value * 1000
-                final_time = final_time + ui["ramp"].value * 1000
+                start_time = RLPy.RGlobal.GetTime() - RLPy.RTick.FromMilliSecond(int(ui["ramp"].value * 1000))
+                final_time = final_time + RLPy.RTick.FromMilliSecond(int(ui["ramp"].value * 1000))
             else:
-                start_time = RLPy.RGlobal.GetTime() - 1
-                final_time = final_time + 1
+                start_time = RLPy.RGlobal.GetTime() - RLPy.RTick.FromMilliSecond(1)
+                final_time = final_time + RLPy.RTick.FromMilliSecond(1)
 
             set_transform_key(c[i], start_time, transform)
             set_transform_key(c[i], final_time, transform)
 
     audio_object = RLPy.RAudio.CreateAudioObject()
     audio_object.Load(ui["wave_file"].value)
-    RLPy.RAudio.LoadAudioToObject(all_clones[0][0], audio_object, RLPy.RGlobal.GetTime())
+    if len(all_clones) > 0:
+        RLPy.RAudio.LoadAudioToObject(all_clones[0][0], audio_object, RLPy.RGlobal.GetTime())
     RLPy.RGlobal.Play(start_time, final_time)
 
     ui["apply"].setVisible(True)
@@ -271,6 +292,8 @@ def clone_and_offset():
     global ui, all_items
 
     clones = []
+
+    fps = RLPy.RGlobal.GetFps()
 
     for item in ui["selection"].value:
         all_items.append(item)
@@ -283,7 +306,7 @@ def clone_and_offset():
         if ui["sync"].value:
             clones.append(entry)
         else:
-            if len(clones) is 0:
+            if len(clones) == 0:
                 clones.append(entry)
             else:
                 entry = clones[0]
@@ -292,7 +315,7 @@ def clone_and_offset():
             clone = item.Clone()
             entry.append(clone)
             control = clone.GetControl("Transform")
-            control.SetValue(RLPy.RGlobal.GetStartTime(), transform)
+            control.SetValue(RLPy.RGlobal.GetStartTime(), fps, transform)
             data_block = control.GetDataBlock()
             offset = position[ui["alignment"].currentText] + ui["spacing"].value * i
             data_block.GetControl("Position/Position"+ui["alignment"].currentText).SetValue(RLPy.RGlobal.GetStartTime(), offset)
