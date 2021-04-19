@@ -21,7 +21,7 @@ import RLPy
 import os
 from math import *
 from PySide2 import *
-from shiboken2 import wrapInstance
+from PySide2.shiboken2 import wrapInstance
 
 ui = {}  # User interface globals
 events = {}  # Callback event globals
@@ -150,12 +150,12 @@ def key_camera():
 
     # Get the frame and time duration of the target prop only
     fps = RLPy.RGlobal.GetFps()
-    start_time = RLPy.IndexedFrameTime(ui["widget"].start_frame.value(), fps)
-    end_time = RLPy.IndexedFrameTime(ui["widget"].end_frame.value(), fps)
+    start_time = RLPy.RTime.IndexedFrameTime(ui["widget"].start_frame.value(), fps)
+    end_time = RLPy.RTime.IndexedFrameTime(ui["widget"].end_frame.value(), fps)
 
     # How many keys are needed to create the whole animation from start to finish?
     key_interval = ui["widget"].delay.value()
-    total_keys = int(ceil((ui["widget"].end_frame.value() - ui["widget"].start_frame.value()) / key_interval))
+    total_keys = int(RLPy.RMath.Ceil((ui["widget"].end_frame.value() - ui["widget"].start_frame.value()) / key_interval))
 
     # Show the progress bar
     ui["widget"].progress.setRange(0, total_keys)
@@ -167,7 +167,7 @@ def key_camera():
     # Iterate over every keyframe
     for key in range(0, total_keys):
         current_frame = ui["widget"].start_frame.value() + key * key_interval
-        current_time = RLPy.IndexedFrameTime(int(current_frame), fps)
+        current_time = RLPy.RTime.IndexedFrameTime(int(current_frame), fps)
         view_transform = camera.WorldTransform()
         target_transform = destination_transform()
         # Step forward in the timeline
@@ -176,7 +176,7 @@ def key_camera():
         # Lerp between the current camera position and its destination using tautness as the interpolate
         new_transform = transform_lerp(view_transform, target_transform, ui["widget"].tautness.value())
         # Key the camera's transform for animation
-        camera.GetControl("Transform").SetValue(current_time, RLPy.RGlobal.GetFps(), new_transform)
+        camera.GetControl("Transform").SetValue(current_time, new_transform)
 
     # Post-process frame reduction
     if ui["widget"].reduction.value() > 0:
@@ -187,7 +187,7 @@ def key_camera():
 
         for index in range(0, key_count):
             if index % interval != 0:
-                key_times.append(RLPy.RTime.FromValue(0))
+                key_times.append(RLPy.RTime())
                 control.GetKeyTimeAt(index, key_times[len(key_times) - 1])
 
         for time in range(0, len(key_times)):
@@ -210,7 +210,7 @@ def setup():
     camera_controller = all_cameras[ui["widget"].camera.currentIndex()].GetControl("Transform")
     camera_controller.ClearKeys()
     # Position the camera on the start frame
-    camera_controller.SetValue(RLPy.RGlobal.GetStartTime(), RLPy.RGlobal.GetFps(), destination_transform())
+    camera_controller.SetValue(RLPy.RGlobal.GetStartTime(), destination_transform())
 
     key_camera()
 
@@ -249,8 +249,8 @@ def reset_ui():
     ui["widget"].elevation.setValue(0)
 
     # Frame Duration
-    start_frame = RLPy.GetFrameIndex(RLPy.RGlobal.GetStartTime(), RLPy.RGlobal.GetFps())
-    end_frame = RLPy.GetFrameIndex(RLPy.RGlobal.GetEndTime(), RLPy.RGlobal.GetFps())
+    start_frame = RLPy.RTime.GetFrameIndex(RLPy.RGlobal.GetStartTime(), RLPy.RGlobal.GetFps())
+    end_frame = RLPy.RTime.GetFrameIndex(RLPy.RGlobal.GetEndTime(), RLPy.RGlobal.GetFps())
     ui["widget"].start_frame.setValue(start_frame)
     ui["widget"].end_frame.setValue(end_frame)
 
