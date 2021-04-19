@@ -27,7 +27,7 @@ from PySide2.QtCore import QIODevice
 from PySide2.QtGui import *
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import *
-from shiboken2 import wrapInstance
+from PySide2.shiboken2 import wrapInstance
 
 #create main dialog
 layer_manger_dlg = None
