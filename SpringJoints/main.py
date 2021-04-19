@@ -2,7 +2,7 @@ import RLPy
 import math
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt
-from shiboken2 import wrapInstance
+from PySide2.shiboken2 import wrapInstance
 
 import ExtensionsForSpring as Ext
 
@@ -472,7 +472,7 @@ def clear_current_key():
     for i in bone_hierarchy:
         for bone in bone_hierarchy[i]:
             animation_clip = bone["root"].GetSkeletonComponent().GetClip(0)
-            animation_clip.SetLength(RLPy.RTick.FromMilliSecond(1))
+            animation_clip.SetLength(RLPy.RTime(1))
 
             bone["data block"].GetControl("Rotation/RotationX").ClearKeys()
             bone["data block"].GetControl("Rotation/RotationY").ClearKeys()
