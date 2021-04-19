@@ -19,7 +19,7 @@
 import RLPy, math, json, os
 from functools import *
 from PySide2 import QtWidgets, QtCore, QtGui
-from shiboken2 import wrapInstance
+from PySide2.shiboken2 import wrapInstance
 
 
 def Lerp(value1, value2, amount):
@@ -163,7 +163,7 @@ class FileControl(QtWidgets.QWidget):
     def open_file(self):
         file_path = RLPy.RUi.OpenFileDialog(self.__extensions)
 
-        if file_path != "":
+        if file_path is not "":
             self.__path = file_path
             self.lineEdit.setText(os.path.basename(self.__path))
             self.valueChanged.emit(self.__path)
@@ -207,11 +207,11 @@ class SelectionControl(QtWidgets.QWidget):
                 selected_objects.append(item.GetName())
                 self.__objects.append(item)
         if len(self.__objects) > 0:
-            self.listView.setModel(QtCore.QStringListModel(selected_objects))
+            self.listView.setModel(QtGui.QStringListModel(selected_objects))
             self.listView.setStyleSheet("")
         else:
             self.listView.setModel(
-                QtCore.QStringListModel(["-- Nothing Selected --"]))
+                QtGui.QStringListModel(["-- Nothing Selected --"]))
             self.listView.setStyleSheet("color: rgb(72, 72, 72);")
         self.valueChanged.emit(self.__objects)
 
