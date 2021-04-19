@@ -26,7 +26,7 @@ from PySide2 import QtWidgets, QtGui
 from PySide2.QtWidgets import QWidget, QAbstractItemView 
 from PySide2.QtWidgets import QMenu, QAction, QPushButton
 from PySide2.QtWidgets import QTreeWidgetItem, QTreeWidget, QTreeView, QTableWidget, QComboBox
-from shiboken2 import wrapInstance
+from PySide2.shiboken2 import wrapInstance
 
 music_controller_widget = None
 
@@ -110,7 +110,7 @@ class KeyControlButton(QPushButton):
         time = RLPy.RGlobal.GetTime()
         key.SetTime(time)
         key.SetTransform(prop_transform)
-        control.AddKey(key)
+        control.AddKey(key, RLPy.RGlobal.GetFps())
         control.SetKeyTransition(time, RLPy.ETransitionType_Step, 1.0)
         
         if (RLPy.RGlobal.IsPlaying()):
@@ -133,7 +133,7 @@ class KeyControlButton(QPushButton):
         time = RLPy.RGlobal.GetTime()
         key.SetTime(time)
         key.SetTransform(prop_transform)
-        control.AddKey(key)
+        control.AddKey(key, RLPy.RGlobal.GetFps())
         control.SetKeyTransition(time, RLPy.ETransitionType_Step, 1.0)
     
     def clear_key(self):
