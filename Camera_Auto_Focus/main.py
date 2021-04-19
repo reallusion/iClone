@@ -16,7 +16,7 @@
 import RLPy
 import os
 from PySide2 import *
-from shiboken2 import wrapInstance
+from PySide2.shiboken2 import wrapInstance
 
 caf_ui = {}  # User interface globals
 caf_callbacks = {}  # Global for callbacks, events, and timers
